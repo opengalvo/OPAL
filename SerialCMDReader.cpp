@@ -77,7 +77,7 @@ GCode* SerialCMDReader::process_string(char instruction[])
   //process our command!
     
   //the character / means delete block... used for comments and stuff.
-  if (instruction[0] == '/')
+  if (instruction[0] == '/' || instruction[0] == '(')
   {
     Serial.println("ok");
     return;
