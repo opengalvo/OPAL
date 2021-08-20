@@ -53,22 +53,34 @@ class Synrad48Ctrl {
     uint16_t                laserPWM_OUT_Pin; // = LASER_OUT_PIN;
     uint16_t                laserPSU_SSR_Pin; // = 10;
     
-    bool                    laser_Shutter       = true;
+    bool                    laser_Shutter       = false;
     const static uint16_t   ticklePWM           = 4;
     int                     laserPWM            = 0;
     int                     laserPWMLowerLimit  = 50;
     uint32_t                tickleStart         = 0x0;
     uint32_t                laserInitTime       = {0x1388}; //Millis to wait in warmup state / Tickle state during init
+    int                     currentFreq         =0;
 
-
-void set20kPWM() {
-  analogWriteFrequency(Synrad48Ctrl::laserPWM_OUT_Pin, 20000);
-  analogWrite(Synrad48Ctrl::laserPWM_OUT_Pin, laserPWM); //Output Laser
+void Synrad48Ctrl::set20kPWM(int PWM) {
+  if(currentFreq != 20000) {
+    currentFreq = 20000;
+    //Serial.print("\n Set 20");
+    analogWriteFrequency(LASER_PWM_OUT_PIN, 20000);
+  }
+  //Serial.print("\n 20k PWM: Setting pin");Serial.print(LASER_PWM_OUT_PIN);Serial.print(" to: ");Serial.print(laserPWM);
+  analogWrite(LASER_PWM_OUT_PIN, laserPWM); //Output Laser
+  
 }
 
-void set5kPWM() {
-  analogWriteFrequency(Synrad48Ctrl::laserPWM_OUT_Pin, 5000);
-  analogWrite(Synrad48Ctrl::laserPWM_OUT_Pin, Synrad48Ctrl::ticklePWM); //Output Trickle
+void Synrad48Ctrl::set5kPWM() {
+  if(currentFreq != 5000) {
+    currentFreq = 5000;
+    //Serial.print("\n Set 5");
+    analogWriteFrequency(LASER_PWM_OUT_PIN, 5000);
+  }
+  
+  //Serial.print("\n 5k PWM: Setting pin ");Serial.print(LASER_PWM_OUT_PIN);Serial.print(" to: ");Serial.print(Synrad48Ctrl::ticklePWM);
+  analogWrite(LASER_PWM_OUT_PIN, Synrad48Ctrl::ticklePWM); //Output Trickle
 }
 };
 #endif

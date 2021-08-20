@@ -28,35 +28,36 @@
  *                            = 262.144
  */
 
-#define MM_TO_POSITION_RATIO 262.144 //  --> 250mmx250mm  ==> G1X3 (move X: 3mm) = 3 * 65536/250 (num pos per mm)
+//efine MM_TO_POSITION_RATIO 262.144 //  --> 250mmx250mm  ==> G1X3 (move X: 3mm) = 3 * 65536/250 (num pos per mm)
 
 #define MAX_VAL 2147483630
-
+#define BUFFERSIZE 20
+#define DEFAULT_FEEDRATE 100
   uint64_t nanos();
 struct coordinate {
-  int x = MAX_VAL;
-  int y = MAX_VAL;
-  int z = MAX_VAL;
+  double x = MAX_VAL;
+  double y = MAX_VAL;
+  double z = MAX_VAL;
 };
   
   struct GCode {
 
   char codeprefix;
   int code; // Go = 0 , G28 = 28 etc. Only G0 / G1 Supported so far...
-  int x;
-  int y;
-  int z;
-  int e;
+  double x;
+  double y;
+  double z;
+  double e;
 
-  int i;
-  int j;
+  double i;
+  double j;
 
-  int p;
+  double p;
 
-  int s; // Laser Power
-  int f; // FeedRate
-  int r; // Misc
-  int t; // Misc
+  double s; // Laser Power
+  double f; // FeedRate
+  double r; // Misc
+  double t; // Misc
   double moveLengthNanos;
 };
 

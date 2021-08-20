@@ -61,7 +61,7 @@ void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
     pinMode(laserPSU_SSR_Pin, OUTPUT);
     
     digitalWrite(laserPSU_SSR_Pin,0);
-    analogWrite(laserPWM_OUT_Pin,0);
+    analogWrite(laserPWM_OUT_Pin,1000);
     delay(laserInitTime + 10 );
     digitalWrite(laserPSU_SSR_Pin,1);
     // waist of recources - call handle laser at the beginning of each command instead. //t2.begin(this->handleLaser, 50); //50us = 20kHz
@@ -101,7 +101,7 @@ void Synrad48Ctrl::handleLaser()
  *       30 = DISABLED        - LaserEnable_Pin is HIGH, state is held for 5 seconds
 */
 
-  
+  //Serial.print("\nhandle Laser in state: ");Serial.print(laserState);
   int laserEnablePinState = HIGH; //digitalRead(Synrad48Ctrl::laserEnable_Pin);
   if(laserEnablePinState == LOW)
   {
@@ -144,9 +144,9 @@ void Synrad48Ctrl::handleLaser()
           laserState = 2;
         else
           if(!(Synrad48Ctrl::laser_Shutter))
-            set20kPWM();
+            this->set20kPWM(laserPWM);
           else
-            set5kPWM();
+            this->set5kPWM();
     }
     else //laserState = 30;
     {//Laser has been disabled

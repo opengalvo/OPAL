@@ -24,7 +24,7 @@
 #ifndef PINS_H
   #define PINS_H
   
-  #define LASER_OUT_PIN 1
-  #define LASER_PWM_OUT_PIN 20
+  #define LASER_SSR_OUT_PIN 1
+  #define LASER_PWM_OUT_PIN 6
 
 #endif

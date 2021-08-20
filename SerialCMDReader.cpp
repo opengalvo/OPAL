@@ -39,7 +39,7 @@ SerialCMDReader::SerialCMDReader()
 {
 }
 
-void SerialCMDReader::begin(CircularBuffer<GCode, 50> *buf){
+void SerialCMDReader::begin(CircularBuffer<GCode, BUFFERSIZE> *buf){
   commandBuffer = buf;
   }
 
@@ -66,7 +66,9 @@ void SerialCMDReader::handleSerial()
       {
         
         pSdata = worda;
-        SerialCMDReader::commandBuffer->unshift(*SerialCMDReader::process_string(worda));
+        GCode * sg = SerialCMDReader::process_string(worda);
+        SerialCMDReader::commandBuffer->unshift(*sg);
+        delete sg;
         init_process_string(worda);
       }
    }
@@ -101,48 +103,48 @@ GCode* SerialCMDReader::process_string(char instruction[])
     
   if(has_command('X', instruction, cnt))
   {
-    newCode->x = ((int)search_string('X', instruction, cnt))* MM_TO_POSITION_RATIO;
+    newCode->x = (double)search_string('X', instruction, cnt);
   }
   else
     newCode->x = MAX_VAL;
   if(has_command('Y', instruction, cnt))
-    newCode->y = ((int)search_string('Y', instruction, cnt))* MM_TO_POSITION_RATIO;
+    newCode->y = (double)search_string('Y', instruction, cnt);
   else
     newCode->y = MAX_VAL;
   if(has_command('Z', instruction, cnt))
-    newCode->z = (int)search_string('Z', instruction, cnt);
+    newCode->z = (double)search_string('Z', instruction, cnt);
   else
     newCode->z = MAX_VAL;
   if(has_command('E', instruction, cnt))
-    newCode->e = (int)search_string('E', instruction, cnt);
+    newCode->e = (double)search_string('E', instruction, cnt);
   else
     newCode->e = MAX_VAL;
   if(has_command('F', instruction, cnt))
-    newCode->f = (int)search_string('F', instruction, cnt);
+    newCode->f = (double)search_string('F', instruction, cnt);
   else
     newCode->f = MAX_VAL;
   if(has_command('I', instruction, cnt))
-    newCode->i = (int)search_string('I', instruction, cnt);
+    newCode->i = (double)search_string('I', instruction, cnt);
   else
     newCode->i = MAX_VAL;
   if(has_command('J', instruction, cnt))
-    newCode->j = (int)search_string('J', instruction, cnt);
+    newCode->j = (double)search_string('J', instruction, cnt);
   else
     newCode->j = MAX_VAL;
   if(has_command('P', instruction, cnt))
-    newCode->p = (int)search_string('P', instruction, cnt);
+    newCode->p = (double)search_string('P', instruction, cnt);
   else
     newCode->p = MAX_VAL;
   if(has_command('R', instruction, cnt))
-    newCode->r = (int)search_string('R', instruction, cnt);
+    newCode->r = (double)search_string('R', instruction, cnt);
   else
     newCode->r = MAX_VAL;
   if(has_command('S', instruction, cnt))
-    newCode->s = (int)search_string('S', instruction, cnt);
+    newCode->s = (double)search_string('S', instruction, cnt);
   else
     newCode->s = MAX_VAL;
   if(has_command('T', instruction, cnt))
-    newCode->t = (int)search_string('T', instruction, cnt);
+    newCode->t = (double)search_string('T', instruction, cnt);
   else
     newCode->t = MAX_VAL;
 

@@ -35,16 +35,16 @@
 #include <CircularBuffer.h>
 #include "helpers.h"
 
-#define COMMAND_SIZE 100
+#define COMMAND_SIZE 150
 
 
 class SerialCMDReader
 {
 	public:
 		SerialCMDReader();
-    void begin(CircularBuffer<GCode, 50> *buf);
+    void begin(CircularBuffer<GCode, BUFFERSIZE> *buf);
     void stop(void);
-    CircularBuffer<GCode, 50> *commandBuffer;
+    CircularBuffer<GCode, BUFFERSIZE> *commandBuffer;
     CircularBuffer<char,100> dataBuffer;
     void handleSerial();
     GCode* process_string(char instruction[]);
@@ -73,7 +73,20 @@ class SerialCMDReader
           i++;      
           int k = 0;
           while (i < string_size && k < 10) {
-            if (instruction[i] == 0 || instruction[i] == ' ')
+            if (instruction[i] == 0 || instruction[i] == ' '
+            || instruction[i] == 'E'
+            || instruction[i] == 'F'
+            || instruction[i] == 'I'
+            || instruction[i] == 'J'
+            || instruction[i] == 'P'
+            || instruction[i] == 'R'
+            || instruction[i] == 'S'
+            || instruction[i] == 'T'
+            || instruction[i] == 'X'
+            || instruction[i] == 'Y'
+            || instruction[i] == 'Z'
+            
+            )
               break;
             temp[k] = instruction[i];
             i++;
