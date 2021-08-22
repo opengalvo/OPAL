@@ -45,7 +45,6 @@ class SerialCMDReader
     void begin(CircularBuffer<GCode, BUFFERSIZE> *buf);
     void stop(void);
     CircularBuffer<GCode, BUFFERSIZE> *commandBuffer;
-    CircularBuffer<char,100> dataBuffer;
     void handleSerial();
     GCode* process_string(char instruction[]);
   private:

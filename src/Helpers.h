@@ -22,14 +22,8 @@
 #pragma once
 
 #ifndef HELPERS_H
-/*
- * Projection size 250mm x 250mm
- * Number of positions per mm = 65536/projection size mm
- *                            = 262.144
- */
-
-#define MM_TO_POSITION_RATIO 262.144 //  --> 250mmx250mm  ==> G1X3 (move X: 3mm) = 3 * 65536/250 (num pos per mm)
-#define BUFFERSIZE 15
+#define BUFFERSIZE 50
+#define DEFAULT_FEEDRATE 100
 #define MAX_VAL 2147483630
 #define LASER_IS_SYNRAD
 
