@@ -39,7 +39,7 @@ void SerialCMDReader::handleSerial()
 {
   static char worda[COMMAND_SIZE], *pSdata=worda;
   byte ch;
-  int val;
+  
   if(!SerialCMDReader::commandBuffer->isFull())
     if (Serial.available()) {
       ch = Serial.read();
