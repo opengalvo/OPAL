@@ -20,19 +20,9 @@
 */
 
 #include <Arduino.h>
-#include "helpers.h"
 #include <CircularBuffer.h>
-//#include "Synrad48Ctrl.h"
-
-
+#include "helpers.h"
 #include "SerialCMDReader.h"
-
-//
-//#ifndef TEENSY_TIMER_TOOL
-//#include <TeensyTimerTool.h>
-//using namespace TeensyTimerTool;
-//#define TEENSY_TIMER_TOOL
-//#endif
 
 
 SerialCMDReader::SerialCMDReader()
@@ -66,9 +56,7 @@ void SerialCMDReader::handleSerial()
       {
         
         pSdata = worda;
-        GCode * sg = SerialCMDReader::process_string(worda);
-        SerialCMDReader::commandBuffer->unshift(*sg);
-        delete sg;
+        SerialCMDReader::commandBuffer->unshift(*SerialCMDReader::process_string(worda));
         init_process_string(worda);
       }
    }
@@ -90,11 +78,11 @@ GCode* SerialCMDReader::process_string(char instruction[])
   
   if(SerialCMDReader::has_command('M', instruction, cnt))        {
     newCode->codeprefix = 'M';
-    newCode->code = (int)search_string('M', instruction, cnt);
+    newCode->code = (double)search_string('M', instruction, cnt);
   }
   else if(has_command('G', instruction, cnt))        {
     newCode->codeprefix = 'G';
-    newCode->code = (int)search_string('G', instruction, cnt);
+    newCode->code = (double)search_string('G', instruction, cnt);
   }
   else
   {
@@ -103,12 +91,12 @@ GCode* SerialCMDReader::process_string(char instruction[])
     
   if(has_command('X', instruction, cnt))
   {
-    newCode->x = (double)search_string('X', instruction, cnt);
+    newCode->x = ((double)search_string('X', instruction, cnt))* MM_TO_POSITION_RATIO;
   }
   else
     newCode->x = MAX_VAL;
   if(has_command('Y', instruction, cnt))
-    newCode->y = (double)search_string('Y', instruction, cnt);
+    newCode->y = ((double)search_string('Y', instruction, cnt))* MM_TO_POSITION_RATIO;
   else
     newCode->y = MAX_VAL;
   if(has_command('Z', instruction, cnt))

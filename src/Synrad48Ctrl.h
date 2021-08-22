@@ -61,7 +61,7 @@ class Synrad48Ctrl {
     uint32_t                laserInitTime       = {0x1388}; //Millis to wait in warmup state / Tickle state during init
     int                     currentFreq         =0;
 
-void Synrad48Ctrl::set20kPWM(int PWM) {
+void set20kPWM(int PWM) {
   if(currentFreq != 20000) {
     currentFreq = 20000;
     //Serial.print("\n Set 20");
@@ -72,7 +72,7 @@ void Synrad48Ctrl::set20kPWM(int PWM) {
   
 }
 
-void Synrad48Ctrl::set5kPWM() {
+void set5kPWM() {
   if(currentFreq != 5000) {
     currentFreq = 5000;
     //Serial.print("\n Set 5");

@@ -61,7 +61,7 @@ void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
     pinMode(laserPSU_SSR_Pin, OUTPUT);
     
     digitalWrite(laserPSU_SSR_Pin,0);
-    analogWrite(laserPWM_OUT_Pin,1000);
+    analogWrite(laserPWM_OUT_Pin,0);
     delay(laserInitTime + 10 );
     digitalWrite(laserPSU_SSR_Pin,1);
     // waist of recources - call handle laser at the beginning of each command instead. //t2.begin(this->handleLaser, 50); //50us = 20kHz

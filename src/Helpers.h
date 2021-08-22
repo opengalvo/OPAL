@@ -28,11 +28,13 @@
  *                            = 262.144
  */
 
-//efine MM_TO_POSITION_RATIO 262.144 //  --> 250mmx250mm  ==> G1X3 (move X: 3mm) = 3 * 65536/250 (num pos per mm)
-
+#define MM_TO_POSITION_RATIO 262.144 //  --> 250mmx250mm  ==> G1X3 (move X: 3mm) = 3 * 65536/250 (num pos per mm)
+#define BUFFERSIZE 15
 #define MAX_VAL 2147483630
-#define BUFFERSIZE 20
-#define DEFAULT_FEEDRATE 100
+#define LASER_IS_SYNRAD
+
+#define LASER_MAX 4096
+
   uint64_t nanos();
 struct coordinate {
   double x = MAX_VAL;
@@ -63,5 +65,7 @@ struct coordinate {
 
 
 void printDouble( double val, unsigned int precision);
+
+
   #define HELPERS_H
 #endif

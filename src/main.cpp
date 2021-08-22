@@ -20,18 +20,20 @@
 */
 
 
-#define LASER_IS_SYNRAD
+
 
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include "Pins.h"
 #include "Helpers.h"
+#include "main.h"
 
 #ifdef LASER_IS_SYNRAD
-//#include "Synrad48Ctrl\Synrad48Ctrl.h"
+
 #include "Synrad48Ctrl.h"
+
 Synrad48Ctrl laser;
-#define LASER_MAX 4096
+
 #endif
 
 
@@ -62,10 +64,17 @@ static double distz;
 
 static double feedrate = 100;//DEFAULT_FEEDRATE;
 //double mul = MM_TO_POSITION_RATIO;
+
 GCode * oldPreviousMove;
 GCode * previousMove;
 GCode * currentMove;
 GCode * nextMove;
+
+coordinate target;
+int lastLaserPWR = 0;
+bool laserChanged = false;
+int itcnt = 0;
+static int interpolCnt = 0;
 
 void setup() {
   lastMove.x = 0;
@@ -84,29 +93,21 @@ void setup() {
   serialReciever.begin(&commandBuffer);
 }
 
-coordinate target;
- int lastLaserPWR = 0;
-bool laserChanged = false;
- int itcnt = 0;
-void loop() {  
-  delay(1);
-  if(itcnt>2)
-  {
-    serialReciever.handleSerial();
-    process();
-    
-#ifdef LASER_IS_SYNRAD
-    laser.handleLaser();    
-#endif
+void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, double* result)  {  //Velocity is presumed to be in coordinates/s
 
-    itcnt = 0;
-  }
-  else
-    process();
-  itcnt++;
+  double lengthOfMove = sqrt( (0.0 + xdist)*(0.0 + xdist)  + (0.0 + ydist)*(0.0 + ydist) ); // calc hypo a^2+b^2=c^2
+  //TODO: Verify unit conversion
+  //Serial.print("\nCALC:movelength: ");Serial.print(xresult);
+  *result = ((lengthOfMove*1000*1000*1000/moveVelocity)); //s=v*t -> s/v =t   (movelength/moveVolocity) -> 2pos / (4pos/s) = 0.5s *1000 = 500ms
+  return;
 }
 
-static int interpolCnt = 0;
+void processMcode(GCode* code)
+{
+  //Serial.print("\nExecuting MCode: ");Serial.print(code->codeprefix);Serial.println(code->code);
+  //Serial.print("-- Executing MCode: Not Implemented\n");
+}
+
 void process()  {
   _now = nanos();
   
@@ -236,17 +237,22 @@ void process()  {
   return;
 }
 
-void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, double* result)  {  //Velocity is presumed to be in coordinates/s
+void loop() {  
+  delay(1);
+  if(itcnt>2)
+  {
+    serialReciever.handleSerial();
+    process();
+    
+#ifdef LASER_IS_SYNRAD
+    laser.handleLaser();    
+#endif
 
-  double lengthOfMove = sqrt( (0.0 + xdist)*(0.0 + xdist)  + (0.0 + ydist)*(0.0 + ydist) ); // calc hypo a^2+b^2=c^2
-  //TODO: Verify unit conversion
-  //Serial.print("\nCALC:movelength: ");Serial.print(xresult);
-  *result = ((lengthOfMove*1000*1000*1000/moveVelocity)); //s=v*t -> s/v =t   (movelength/moveVolocity) -> 2pos / (4pos/s) = 0.5s *1000 = 500ms
-  return;
+    itcnt = 0;
+  }
+  else
+    process();
+  itcnt++;
 }
 
-void processMcode(GCode* code)
-{
-  //Serial.print("\nExecuting MCode: ");Serial.print(code->codeprefix);Serial.println(code->code);
-  //Serial.print("-- Executing MCode: Not Implemented\n");
-}
+
