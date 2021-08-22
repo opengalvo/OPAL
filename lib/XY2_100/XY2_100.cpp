@@ -97,7 +97,7 @@ void XY2_100::QT1_isr() {
   //ISR for QT1
   TMR1_CSCTRL1 &= ~(TMR_CSCTRL_TCF1);
   asm volatile ("dsb");                   // wait for clear memory barrier
-  GPIO6_DR = GPIO6_DR & ~(GPIO6_DR) | (d);
+  GPIO6_DR = (GPIO6_DR & ~(GPIO6_DR)) | (d);
 
   //TMR1_CSCTRL1 &= ~(TMR_CSCTRL_TCF1);         // clear comp flag
   if(ClkHiLo)
