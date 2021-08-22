@@ -30,7 +30,7 @@
 
 #ifdef LASER_IS_SYNRAD
 
-#include "Synrad48Ctrl.h"
+#include <Synrad48Ctrl.h>
 
 Synrad48Ctrl laser;
 
