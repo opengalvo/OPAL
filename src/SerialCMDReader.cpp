@@ -92,12 +92,12 @@ GCode* SerialCMDReader::process_string(char instruction[])
     
   if(has_command('X', instruction, cnt))
   {
-    newCode->x = ((double)search_string('X', instruction, cnt))* MM_TO_POSITION_RATIO;
+    newCode->x = ((double)search_string('X', instruction, cnt));
   }
   else
     newCode->x = MAX_VAL;
   if(has_command('Y', instruction, cnt))
-    newCode->y = ((double)search_string('Y', instruction, cnt))* MM_TO_POSITION_RATIO;
+    newCode->y = ((double)search_string('Y', instruction, cnt));
   else
     newCode->y = MAX_VAL;
   if(has_command('Z', instruction, cnt))
