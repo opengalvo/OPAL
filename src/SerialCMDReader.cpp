@@ -56,7 +56,15 @@ void SerialCMDReader::handleSerial()
       {
         
         pSdata = worda;
-        SerialCMDReader::commandBuffer->unshift(*SerialCMDReader::process_string(worda));
+
+        /* the character / means delete block... used for comments and stuff.*/
+        if (worda[0] == '/' || worda[0] == '(')
+        {
+          Serial.println("ok");
+          return;
+        }
+        else
+          SerialCMDReader::commandBuffer->unshift(*SerialCMDReader::process_string(worda));
         init_process_string(worda);
       }
    }
@@ -65,13 +73,6 @@ void SerialCMDReader::handleSerial()
 GCode* SerialCMDReader::process_string(char instruction[])
 {
   //process our command!
-    
-  //the character / means delete block... used for comments and stuff.
-  if (instruction[0] == '/' || instruction[0] == '(')
-  {
-    Serial.println("ok");
-    return;
-  }
   
   GCode* newCode = new GCode();
   //TODO: determine if delete newcode is needed to keep memmory clean...
