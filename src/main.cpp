@@ -31,13 +31,14 @@
 #ifdef LASER_IS_SYNRAD
 
 #include <Synrad48Ctrl.h>
+#include <XY2_100.h>
 
 Synrad48Ctrl laser;
 
 #endif
 
 
-#include "XY2_100.h"
+
 XY2_100 galvo;
 
 #include <CircularBuffer.h>
