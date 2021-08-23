@@ -44,6 +44,7 @@ uint16_t LastPWMRequest = 0;
 void Synrad48Ctrl::setLaserPWM(uint16_t PWM)
 {
   laserPWM = PWM;
+  handleLaser();
   }
 
 void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
@@ -91,7 +92,21 @@ bool Synrad48Ctrl::isInitiallized()
 
 void Synrad48Ctrl::handleLaser()
 {
-/*   
+  if(isInitiallized())
+  {
+    if( laserPWM==oldlaserPWM)
+    {
+      //Serial.print("\n"); Serial.print(laserPWM); Serial.print(""); Serial.print("Old and new are same"); 
+      return;
+    }
+    if(laserPWM!=oldlaserPWM)
+    {
+      //Serial.print("\n"); Serial.print(laserPWM); Serial.print("Old and new are Different ======\n========\n========\n======\n======");
+      oldlaserPWM = laserPWM;
+    }
+  }
+  
+/*   |
  *  LaserStates:
  *       0 = BEGINWARMUP      - LaserEnable_Pin is HIGH, start the timer and go to warmup
  *       1 = WARMUP           - LaserEnable_Pin is HIGH, state is held for 5 seconds
@@ -105,21 +120,27 @@ void Synrad48Ctrl::handleLaser()
   int laserEnablePinState = HIGH; //digitalRead(Synrad48Ctrl::laserEnable_Pin);
   if(laserEnablePinState == LOW)
   {
-    laserState = 0;
+    laserState = 30;  //TODO: Fix how to get out of this
     tickleStart = 0x0;
     analogWrite(Synrad48Ctrl::laserPWM_OUT_Pin, 0);
   }
   else
   { 
     uint32_t NOW = millis();
-    if(laserState == 0)
-    {//IN BEGIN WARMUP STATE
+
+    switch (laserState)
+    {
+      case 0:
+      {
+        //IN BEGIN WARMUP STATE
         set5kPWM();
         tickleStart = NOW;
         laserState = 1;
-    }
-    else if(laserState == 1)
-    {// IN WARMUP STATE
+        //fallthrough intended
+      }
+      case 1:
+      {
+        // IN WARMUP STATE
         bool wait = tickleStart > (NOW-laserInitTime);
         if (!wait)
         {
@@ -127,30 +148,49 @@ void Synrad48Ctrl::handleLaser()
           tickleStart = 0;
           laserState = 2;
         }
-    }
-    else if(laserState == 2)
-    {// IN INIT READY STATE
-        set5kPWM();
+        break;
+      }
+      case 2:
+      {
+        // IN INIT READY STATE
+        this->set5kPWM();
         laserState = 3;
-    }
-    else if(laserState == 3)
-    {// IN READY STATE
+        //fallthrough intended
+      }
+      case 3:
+      {
+        // IN READY STATE
         if(laserPWM>laserPWMLowerLimit)
           laserState = 4;
-    }
-    else if(laserState == 4)
-    {// IN LAZING STATE
+        else
+          break;
+        //fallthrough intended
+      }
+      case 4:
+      {
+        // IN LAZING STATE
         if(laserPWM<=laserPWMLowerLimit)
-          laserState = 2;
+        {
+          //laserState = 2;
+          this->set5kPWM();
+          laserState = 3;
+        }
         else
           if(!(Synrad48Ctrl::laser_Shutter))
             this->set20kPWM(laserPWM);
           else
             this->set5kPWM();
-    }
-    else //laserState = 30;
-    {//Laser has been disabled
+        break;
+      }
+      default:
+      {
+        //laserState = 30;
+        //Laser has been disabled
         analogWrite(Synrad48Ctrl::laserPWM_OUT_Pin, 0);
+        break;
+      }
     }
+    
   }
 }
+

@@ -54,7 +54,8 @@ class Synrad48Ctrl {
     int                     laserPWMLowerLimit  = 50;
     uint32_t                tickleStart         = 0x0;
     uint32_t                laserInitTime       = {0x1388}; //Millis to wait in warmup state / Tickle state during init
-    int                     currentFreq         =0;
+    int                     currentFreq         = 0;
+    int                  oldlaserPWM         = 0;
 
 void set20kPWM(int PWM) {
   if(currentFreq != 20000) {
