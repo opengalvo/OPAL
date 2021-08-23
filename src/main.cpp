@@ -124,7 +124,7 @@ void process()  {
     bool gcodeFound = false;
     while(!gcodeFound && !commandBuffer.isEmpty())
     {
-      nextMove = new GCode((commandBuffer.shift()));
+      nextMove = new GCode((commandBuffer.pop()));
       if((*nextMove).codeprefix != 'G'){
         mBuffer.unshift(*nextMove);
       }
@@ -179,7 +179,7 @@ void process()  {
       {
         laser.setLaserPWM(0);
       }
-      laser.handleLaser();
+      //laser.handleLaser();
       beginNext = false;
     }
   }
@@ -188,7 +188,7 @@ void process()  {
   if(currentMove && (_now > endNanos || (*currentMove).code == 0))  //We are out of time or G0
   {
     laser.handleLaser();
-    galvo.goTo(map(to.x, 0.0,250.0, 0,65535)+0.5, map(to.y, 0.0,250.0, 0,65535)+0.5); //Make sure to hit the commanded position
+    galvo.goTo(map(to.x, 0.0,250.0, 65535,0)+0.5, map(to.y, 0.0,250.0, 0,65535)+0.5); //Make sure to hit the commanded position
     beginNext = true;
     interpolCnt=0;
     return;
@@ -205,7 +205,8 @@ void process()  {
     double x = (lastMove.x + (distx*fraction_of_move));
     double y = (lastMove.y + (disty*fraction_of_move));
     interpolCnt++;
-    galvo.goTo( map(x, 0.0,250.0, 0,65535)+0.5, map(y, 0.0,250.0, 0,65535)+0.5 );
+    laser.handleLaser();
+    galvo.goTo( map(x, 0.0,250.0, 65535,0)+0.5, map(y, 0.0,250.0, 0,65535)+0.5 );
     return ;
   }
   else 
@@ -216,21 +217,14 @@ void process()  {
 }
 
 void loop() {  
-  delay(1);
-  if(itcnt>2)
-  {
+
     serialReciever.handleSerial();
     process();
     
 #ifdef LASER_IS_SYNRAD
-    laser.handleLaser();    
+    //laser.handleLaser();    
 #endif
 
-    itcnt = 0;
-  }
-  else
-    process();
-  itcnt++;
 }
 
 
