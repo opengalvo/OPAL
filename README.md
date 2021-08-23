@@ -3,6 +3,14 @@
 Minimalistic FW for Processing GCode commands to xy2-100 protocol and control periferal devices.
 The default usecase is a 3D printer/engraver.
 
+DEMO
+Laser Marking - OpenGalvo - OPAL FW SG7110 Teensy 4.0
+Slow:
+  https://youtu.be/uMT-sZhYKJo
+Fast:
+  https://youtu.be/m6PLiacBdws
+
+
 This project began long time ago but since its code might be useful to others it is published here.
 It started as a fun exercise to control mirrors glued to a harddrives reading arm. While his was a
 fun DIY hack, hopes where to learn more about how laser scanners work and what uses they might have.
