@@ -58,7 +58,7 @@ void SerialCMDReader::handleSerial()
         pSdata = worda;
 
         /* the character / means delete block... used for comments and stuff.*/
-        if (worda[0] == '/' || worda[0] == '(')
+        if (worda[0] == '/' || worda[0] == '(' || worda[0] == ';')
         {
           Serial.println("ok");
           return;
