@@ -64,7 +64,11 @@ void SerialCMDReader::handleSerial()
           return;
         }
         else
-          SerialCMDReader::commandBuffer->unshift(*SerialCMDReader::process_string(worda));
+        {
+          GCode* tmp = SerialCMDReader::process_string(worda);
+          SerialCMDReader::commandBuffer->unshift(*tmp);
+          delete tmp;
+        }
         init_process_string(worda);
       }
    }

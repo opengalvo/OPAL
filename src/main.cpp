@@ -142,27 +142,27 @@ void process()  {
     if(previousMove)  //SET UP PREVIOUS POSITION
     {
       if((*previousMove).x != MAX_VAL)
-        lastMove.x = *(new double((*previousMove).x));
+        lastMove.x = (*previousMove).x;
       if((*previousMove).y != MAX_VAL)
-        lastMove.y = *(new double((*previousMove).y));
+        lastMove.y = (*previousMove).y;
       if((*previousMove).z != MAX_VAL)
-        lastMove.z = *(new double((*previousMove).z));
+        lastMove.z = (*previousMove).z;
     }
     
     if(currentMove)  { 
       if((*currentMove).x != MAX_VAL)
-        to.x = *(new double((*currentMove).x));
+        to.x = (*currentMove).x;
       if((*currentMove).y != MAX_VAL)
-        to.y = *(new double((*currentMove).y));
+        to.y = (*currentMove).y;
       if((*currentMove).z != MAX_VAL)
-        to.z = *(new double((*currentMove).z));
+        to.z = (*currentMove).z;
       if((*currentMove).f != MAX_VAL)
-        feedrate = *(new double((*currentMove).f));
+        feedrate = (*currentMove).f;
         
       // Set Laser Power
       if((*currentMove).s != MAX_VAL)
       {
-        lastLaserPWR = *(new double((*currentMove).s));
+        lastLaserPWR = (*currentMove).s;
         laserChanged = true;
       }
 
