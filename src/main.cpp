@@ -88,6 +88,10 @@ void setup() {
   Serial.begin(115200);
   galvo.begin();
   serialReciever.begin(&commandBuffer);
+  
+    pinMode(13, OUTPUT);
+    
+    digitalWrite(13,0); //Set LED OFF
 }
 
 void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, double* result)  {  //Velocity is presumed to be in coordinates/s

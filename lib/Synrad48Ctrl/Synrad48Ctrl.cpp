@@ -150,6 +150,7 @@ void Synrad48Ctrl::handleLaser()
       case 3:
       {
         // IN READY STATE
+        digitalWrite(13,1); //Set LED ON
         if(laserPWM>laserPWMLowerLimit)
           laserState = 4;
         else
