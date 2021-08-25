@@ -76,10 +76,8 @@ void SerialCMDReader::handleSerial()
 
 GCode* SerialCMDReader::process_string(char instruction[])
 {
-  //process our command!
-  
+  //process our command
   GCode* newCode = new GCode();
-  //TODO: determine if delete newcode is needed to keep memmory clean...
   
   if(SerialCMDReader::has_command('M', instruction, cnt))        {
     newCode->codeprefix = 'M';
@@ -92,55 +90,15 @@ GCode* SerialCMDReader::process_string(char instruction[])
   else
   {
     newCode->codeprefix = 'G';
-    }
-    
-  if(has_command('X', instruction, cnt))
-  {
-    newCode->x = ((double)search_string('X', instruction, cnt));
   }
-  else
-    newCode->x = MAX_VAL;
-  if(has_command('Y', instruction, cnt))
-    newCode->y = ((double)search_string('Y', instruction, cnt));
-  else
-    newCode->y = MAX_VAL;
-  if(has_command('Z', instruction, cnt))
-    newCode->z = (double)search_string('Z', instruction, cnt);
-  else
-    newCode->z = MAX_VAL;
-  if(has_command('E', instruction, cnt))
-    newCode->e = (double)search_string('E', instruction, cnt);
-  else
-    newCode->e = MAX_VAL;
-  if(has_command('F', instruction, cnt))
-    newCode->f = (double)search_string('F', instruction, cnt);
-  else
-    newCode->f = MAX_VAL;
-  if(has_command('I', instruction, cnt))
-    newCode->i = (double)search_string('I', instruction, cnt);
-  else
-    newCode->i = MAX_VAL;
-  if(has_command('J', instruction, cnt))
-    newCode->j = (double)search_string('J', instruction, cnt);
-  else
-    newCode->j = MAX_VAL;
-  if(has_command('P', instruction, cnt))
-    newCode->p = (double)search_string('P', instruction, cnt);
-  else
-    newCode->p = MAX_VAL;
-  if(has_command('R', instruction, cnt))
-    newCode->r = (double)search_string('R', instruction, cnt);
-  else
-    newCode->r = MAX_VAL;
-  if(has_command('S', instruction, cnt))
-    newCode->s = (double)search_string('S', instruction, cnt);
-  else
-    newCode->s = MAX_VAL;
-  if(has_command('T', instruction, cnt))
-    newCode->t = (double)search_string('T', instruction, cnt);
-  else
-    newCode->t = MAX_VAL;
-
+  char parameters[] = {'X','Y','Z','E','A','B','C','F','I','J','P','R','S','T'};
+  for(int i = 0; i < 14; i++)
+  {
+    if(has_command(parameters[i], instruction, cnt))
+      newCode->x = ((double)search_string(parameters[i], instruction, cnt));
+    else
+      newCode->x = MAX_VAL;
+  }
   Serial.println("ok");  
   return newCode;
 }

@@ -44,6 +44,10 @@ struct coordinate {
   double y;
   double z;
   double e;
+  
+  double a;
+  double b;
+  double c;
 
   double i;
   double j;
