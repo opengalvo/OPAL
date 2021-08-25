@@ -1,5 +1,5 @@
 /*
-  Pins.h - driver code to handle Pin definitions on PJRC Teensy 4.x board
+  Helpers.h - Helper functions to be used by OPAL FW on PJRC Teensy 4.x board
 
   Part of OpenGalvo - OPAL Firmware
 
@@ -21,33 +21,10 @@
 
 #pragma once
 
-#ifndef PINS_H
-  #define PINS_H
-  /*
-  The following pins are not configurable as DIRECT PORT Writes are used within the code
-    XY2_100 - clock = 22;
-    XY2_100 - sync  = 17;  
-    XY2_100 - dataX = 19;
-    XY2_100 - dataY = 14;
-  */
-
- /*
-  Pin for SSR Relay control of stepper PSU
- */
-  #define STEPPER_SSR_OUT_PIN 3
- /*
-  Pin for SSR Relay control of galvo PSU
- */
-  #define GALVO_SSR_OUT_PIN 2
-
-   /*
-  Pin for SSR Relay control of laser PSU
- */
-  #define LASER_SSR_OUT_PIN 1
-
-  /*
-    PWM pin to control laser power/intensity (0-4095)
-  */
-  #define LASER_PWM_OUT_PIN 6
-
+#ifndef MCODES_H
+  #define MCODES_H
+  //M17 - Turn all steppers ON -> Galvo PSU Control (SSR)
+  //M18 - Turn all steppers OFF -> Galvo PSU Control (SSR)
+  //M80 - Laser PSU Control (SSR) Implicit delay for SynradCtrl::laserInitTime milliseconds (5000)
+  //M81 - Laser PSU Control (SSR)
 #endif

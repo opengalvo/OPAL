@@ -23,7 +23,9 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include "Pins.h"
+#include "configuration.h"
 #include "Helpers.h"
+#include "Mcodes.h"
 #include "main.h"
 
 #ifdef LASER_IS_SYNRAD
@@ -40,8 +42,8 @@ Synrad48Ctrl laser;
 XY2_100 galvo;
 
 #include <CircularBuffer.h>
-CircularBuffer<GCode, BUFFERSIZE> commandBuffer;
-CircularBuffer<GCode, BUFFERSIZE> mBuffer;
+CircularBuffer<GCode, CMDBUFFERSIZE> commandBuffer;
+CircularBuffer<GCode, MBUFFERSIZE> mBuffer;
 
 #include "SerialCMDReader.h"
 SerialCMDReader serialReciever;
@@ -84,10 +86,7 @@ void setup() {
   to.z = 0;
   
   Serial.begin(115200);
-#ifdef LASER_IS_SYNRAD
-  laser.begin(LASER_PWM_OUT_PIN, LASER_SSR_OUT_PIN);
-#endif
-  galvo.begin(); //TODO:ADD define "Galvo has SSR" for galvo PSU
+  galvo.begin();
   serialReciever.begin(&commandBuffer);
 }
 
@@ -101,6 +100,64 @@ void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, d
 
 void processMcode(GCode* code)
 {
+  switch (code->code)
+  {
+  case 3: //M3
+    /*    Code is Spindle CV Normally used for spindle on direction CV and 'Sxxxxx' to set RPM
+        When using Laser laser has no rotaton so handles same as M4  */
+        //Fallthrough intended
+  case 4: //M4
+  {
+    int lpower = (*previousMove).s;
+    if( lpower != MAX_VAL)
+    {
+      lastLaserPWR = lpower;
+    }
+    #ifdef LASER_IS_SYNRAD
+    laser.setLaserPWM(lastLaserPWR); //Unknown code might cause unexpected behaviour Better turn off laser - SAFETY
+    #else
+    digitalWrite(LASER_PWM_OUT_PIN, lastLaserPWR);
+    #endif    
+    break;
+  }
+  case 5: //M5
+    lastLaserPWR = 0;        
+    #ifdef LASER_IS_SYNRAD
+      laser.setLaserPWM(0); //Unknown code might cause unexpected behaviour Better turn off laser - SAFETY
+    #else
+      digitalWrite(LASER_PWM_OUT_PIN, 0);
+    #endif
+    break;
+
+  case 17: //M17 - Turn all steppers ON -> Galvo & Stepper PSU Control (SSRs)
+    digitalWrite(GALVO_SSR_OUT_PIN, 1);
+    digitalWrite(STEPPER_SSR_OUT_PIN, 1); 
+    break;
+  case 18: //M18 - Turn all steppers OFF -> Galvo & Stepper PSU Control (SSRs)
+    digitalWrite(GALVO_SSR_OUT_PIN, 0);
+    digitalWrite(STEPPER_SSR_OUT_PIN, 0); 
+    break;
+
+case 80: //M80 - Laser PSU Control (SSR)
+    // Implicit delay for SynradCtrl::laserInitTime milliseconds (5000ms)
+    #ifdef LASER_IS_SYNRAD
+    laser.begin(LASER_PWM_OUT_PIN, LASER_SSR_OUT_PIN);
+    #else
+    digitalWrite(LASER_SSR_OUT_PIN,1);
+    #endif
+
+    break;
+  case 81: //M81 - Laser PSU Control (SSR)
+    #ifdef LASER_IS_SYNRAD
+    laser.stop();
+    #else
+    digitalWrite(LASER_SSR_OUT_PIN,0);
+    #endif
+    break;
+  
+  default:
+    break;
+  }
   //Serial.print("\nExecuting MCode: ");Serial.print(code->codeprefix);Serial.println(code->code);
   //Serial.print("-- Executing MCode: Not Implemented\n");
 }
@@ -166,20 +223,37 @@ void process()  {
         laserChanged = true;
       }
 
-      if((*currentMove).code != 0) { // G0 means no calculation and no interpolation as feedrate is ignored and laser is expected off.
-        laser.setLaserPWM(lastLaserPWR);
+      if((*currentMove).code == 1) 
+      {   // G1
+        #ifdef LASER_G0_OFF_G1_ON
+          #ifdef LASER_IS_SYNRAD
+          laser.setLaserPWM(lastLaserPWR); //Unknown code might cause unexpected behaviour Better turn off laser - SAFETY
+          #endif
+        #endif
         startNanos = _now;      
         distx = to.x-lastMove.x;
         disty = to.y-lastMove.y;
-        distz = to.z-lastMove.z; // not used.....
+        distz = to.z-lastMove.z; //TODO: Add implementation
         calculateMoveLengthNanos(distx, disty, feedrate, &((*currentMove).moveLengthNanos));
         endNanos = startNanos + (*currentMove).moveLengthNanos;
       }
-      else
-      {
-        laser.setLaserPWM(0);
+      else if((*currentMove).code == 0)
+      {   //G0 means no calculation and no interpolation as feedrate is ignored
+        #ifdef LASER_G0_OFF_G1_ON
+            #ifdef LASER_IS_SYNRAD
+             laser.setLaserPWM(0); //Unknown code might cause unexpected behaviour Better turn off laser - SAFETY
+            #endif
+        #endif
       }
-      //laser.handleLaser();
+      else
+      {   //
+        Serial.println("Unknown GCode! code: ");
+        Serial.println((*currentMove).codeprefix);
+        Serial.println((*currentMove).code);
+        #ifdef LASER_IS_SYNRAD
+          laser.setLaserPWM(0); //Unknown code might cause unexpected behaviour Better turn off laser - SAFETY
+        #endif
+      }
       beginNext = false;
     }
   }
@@ -187,7 +261,9 @@ void process()  {
   //interpolate  
   if(currentMove && (_now > endNanos || (*currentMove).code == 0))  //We are out of time or G0
   {
-    laser.handleLaser();
+    #ifdef LASER_IS_SYNRAD
+      laser.handleLaser();    
+    #endif
     galvo.goTo(map(to.x, 0.0,250.0, 65535,0)+0.5, map(to.y, 0.0,250.0, 0,65535)+0.5); //Make sure to hit the commanded position
     beginNext = true;
     interpolCnt=0;
@@ -205,7 +281,9 @@ void process()  {
     double x = (lastMove.x + (distx*fraction_of_move));
     double y = (lastMove.y + (disty*fraction_of_move));
     interpolCnt++;
-    laser.handleLaser();
+    #ifdef LASER_IS_SYNRAD
+      laser.handleLaser();    
+    #endif
     galvo.goTo( map(x, 0.0,250.0, 65535,0)+0.5, map(y, 0.0,250.0, 0,65535)+0.5 );
     return ;
   }
@@ -221,9 +299,7 @@ void loop() {
     serialReciever.handleSerial();
     process();
     
-#ifdef LASER_IS_SYNRAD
-    //laser.handleLaser();    
-#endif
+
 
 }
 

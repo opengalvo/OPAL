@@ -29,7 +29,7 @@ SerialCMDReader::SerialCMDReader()
 {
 }
 
-void SerialCMDReader::begin(CircularBuffer<GCode, BUFFERSIZE> *buf){
+void SerialCMDReader::begin(CircularBuffer<GCode, CMDBUFFERSIZE> *buf){
   commandBuffer = buf;
   }
 
