@@ -22,12 +22,8 @@
 #pragma once
 
 #ifndef HELPERS_H
-#define BUFFERSIZE 50
-#define DEFAULT_FEEDRATE 100
-#define MAX_VAL 2147483630
-#define LASER_IS_SYNRAD
 
-#define LASER_MAX 4096
+#define MAX_VAL 2147483630
 
   uint64_t nanos();
 struct coordinate {
@@ -44,6 +40,10 @@ struct coordinate {
   double y;
   double z;
   double e;
+
+  double a;
+  double b;
+  double c;
 
   double i;
   double j;

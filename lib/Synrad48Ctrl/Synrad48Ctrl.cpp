@@ -21,18 +21,9 @@
 
 #include <Arduino.h>
 
-//#ifndef TEENSY_TIMER_TOOL
-//#include <TeensyTimerTool.h>
-//using namespace TeensyTimerTool;
-//#define TEENSY_TIMER_TOOL
-//#endif
-
 #include <string.h>
 #include "Synrad48Ctrl.h"
 #define LASER_RESOLUTION 12
-
-
-//PeriodicTimer t2;
 
 Synrad48Ctrl::Synrad48Ctrl()
 {
@@ -63,10 +54,9 @@ void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
     
     digitalWrite(laserPSU_SSR_Pin,0);
     analogWrite(laserPWM_OUT_Pin,0);
-    delay(laserInitTime + 10 );
+    delay(laserInitTime );
     digitalWrite(laserPSU_SSR_Pin,1);
-    // waist of recources - call handle laser at the beginning of each command instead. //t2.begin(this->handleLaser, 50); //50us = 20kHz
-  
+    
     laserState = 0;
     laserPWM = 0;
   }
@@ -160,6 +150,7 @@ void Synrad48Ctrl::handleLaser()
       case 3:
       {
         // IN READY STATE
+        digitalWrite(13,1); //Set LED ON
         if(laserPWM>laserPWMLowerLimit)
           laserState = 4;
         else
