@@ -176,7 +176,7 @@ uint8_t XY2_100::parity(uint16_t v)
     return (t & 1);
 }
 
-void XY2_100::goTo(uint16_t x,uint16_t y)
+void XY2_100::setPos(uint16_t x,uint16_t y)
 {
   
     unsigned long dataX = XY2_100::buildMsg(x);

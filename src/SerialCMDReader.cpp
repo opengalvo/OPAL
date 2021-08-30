@@ -25,23 +25,25 @@
 #include "SerialCMDReader.h"
 
 
-SerialCMDReader::SerialCMDReader()
+SerialCMDReader::SerialCMDReader(CircularBuffer<GCode, BUFFERSIZE> *buf)
 {
+  bufRef = buf;
 }
 
-void SerialCMDReader::begin(CircularBuffer<GCode, BUFFERSIZE> *buf){
-  commandBuffer = buf;
+void SerialCMDReader::begin(){
+  
   }
 
 void SerialCMDReader::stop(){}
 
 void SerialCMDReader::handleSerial()
 {
-  static char worda[COMMAND_SIZE], *pSdata=worda;
-  byte ch;
-  
-  if(!SerialCMDReader::commandBuffer->isFull())
+  if(!SerialCMDReader::bufRef->isFull())
     if (Serial.available()) {
+
+      static char worda[COMMAND_SIZE], *pSdata=worda;
+      byte ch;
+
       ch = Serial.read();
       cnt++;
       // -1 for null terminator space
@@ -66,7 +68,7 @@ void SerialCMDReader::handleSerial()
         else
         {
           GCode* tmp = SerialCMDReader::process_string(worda);
-          SerialCMDReader::commandBuffer->unshift(*tmp);
+          SerialCMDReader::bufRef->unshift(*tmp);
           delete tmp;
         }
         init_process_string(worda);
@@ -81,66 +83,55 @@ GCode* SerialCMDReader::process_string(char instruction[])
   GCode* newCode = new GCode();
   //TODO: determine if delete newcode is needed to keep memmory clean...
   
-  if(SerialCMDReader::has_command('M', instruction, cnt))        {
+  if(has_command('M', instruction, cnt))        {
     newCode->codeprefix = 'M';
     newCode->code = (double)search_string('M', instruction, cnt);
-  }
-  else if(has_command('G', instruction, cnt))        {
+
+    newCode->s = getVal('S', instruction, cnt);
+    
+    Serial.println("ok");  
+    return newCode;
+  } // END of Mcode
+  if(has_command('G', instruction, cnt))        {
     newCode->codeprefix = 'G';
     newCode->code = (double)search_string('G', instruction, cnt);
-  }
-  else
-  {
-    newCode->codeprefix = 'G';
-    }
-    
-  if(has_command('X', instruction, cnt))
-  {
-    newCode->x = ((double)search_string('X', instruction, cnt));
-  }
-  else
-    newCode->x = MAX_VAL;
-  if(has_command('Y', instruction, cnt))
-    newCode->y = ((double)search_string('Y', instruction, cnt));
-  else
-    newCode->y = MAX_VAL;
-  if(has_command('Z', instruction, cnt))
-    newCode->z = (double)search_string('Z', instruction, cnt);
-  else
-    newCode->z = MAX_VAL;
-  if(has_command('E', instruction, cnt))
-    newCode->e = (double)search_string('E', instruction, cnt);
-  else
-    newCode->e = MAX_VAL;
-  if(has_command('F', instruction, cnt))
-    newCode->f = (double)search_string('F', instruction, cnt);
-  else
-    newCode->f = MAX_VAL;
-  if(has_command('I', instruction, cnt))
-    newCode->i = (double)search_string('I', instruction, cnt);
-  else
-    newCode->i = MAX_VAL;
-  if(has_command('J', instruction, cnt))
-    newCode->j = (double)search_string('J', instruction, cnt);
-  else
-    newCode->j = MAX_VAL;
-  if(has_command('P', instruction, cnt))
-    newCode->p = (double)search_string('P', instruction, cnt);
-  else
-    newCode->p = MAX_VAL;
-  if(has_command('R', instruction, cnt))
-    newCode->r = (double)search_string('R', instruction, cnt);
-  else
-    newCode->r = MAX_VAL;
-  if(has_command('S', instruction, cnt))
-    newCode->s = (double)search_string('S', instruction, cnt);
-  else
-    newCode->s = MAX_VAL;
-  if(has_command('T', instruction, cnt))
-    newCode->t = (double)search_string('T', instruction, cnt);
-  else
-    newCode->t = MAX_VAL;
 
-  Serial.println("ok");  
-  return newCode;
+    newCode->x = getVal('X', instruction, cnt);
+    newCode->y = getVal('Y', instruction, cnt);
+    newCode->z = getVal('Z', instruction, cnt);
+    newCode->e = getVal('E', instruction, cnt);
+    newCode->a = getVal('A', instruction, cnt);
+    newCode->b = getVal('B', instruction, cnt);
+    newCode->c = getVal('C', instruction, cnt);
+    newCode->f = getVal('F', instruction, cnt);
+    newCode->i = getVal('I', instruction, cnt);
+    newCode->j = getVal('J', instruction, cnt);
+    newCode->p = getVal('P', instruction, cnt);
+    newCode->r = getVal('R', instruction, cnt);
+    newCode->s = getVal('S', instruction, cnt);
+    newCode->t = getVal('T', instruction, cnt);
+
+    Serial.println("ok");  
+    return newCode;
+  } //END of Gcode
+  else 
+  {
+    newCode->x = getVal('X', instruction, cnt);
+    newCode->y = getVal('Y', instruction, cnt);
+    newCode->z = getVal('Z', instruction, cnt);
+    newCode->e = getVal('E', instruction, cnt);
+    newCode->a = getVal('A', instruction, cnt);
+    newCode->b = getVal('B', instruction, cnt);
+    newCode->c = getVal('C', instruction, cnt);
+    newCode->f = getVal('F', instruction, cnt);
+    newCode->i = getVal('I', instruction, cnt);
+    newCode->j = getVal('J', instruction, cnt);
+    newCode->p = getVal('P', instruction, cnt);
+    newCode->r = getVal('R', instruction, cnt);
+    newCode->s = getVal('S', instruction, cnt);
+    newCode->t = getVal('T', instruction, cnt);
+
+    Serial.println("ok");  
+    return newCode;
+  }
 }

@@ -1,5 +1,5 @@
 /*
-  OPAL.ino - Main projectfile to run OPAL FW on PJRC Teensy 4.x board
+  main.cpp - Main projectfile to run OPAL FW on PJRC Teensy 4.x board
 
   Part of OpenGalvo - OPAL Firmware
 
@@ -19,212 +19,69 @@
   along with OPAL Firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#include <Arduino.h>
-#include <HardwareSerial.h>
-#include "Pins.h"
-#include "Helpers.h"
 #include "main.h"
 
+
+static CircularBuffer<GCode, BUFFERSIZE> commandBuffer;
+static CircularBuffer<GCode, BUFFERSIZE> mBuffer;
+
+
+MotionMGR* motion;
+
+XY2_100* galvo;
+
+SerialCMDReader *serialReciever;
+
 #ifdef LASER_IS_SYNRAD
-
-#include <Synrad48Ctrl.h>
-#include <XY2_100.h>
-
-Synrad48Ctrl laser;
-
+//Synrad48Ctrl syn;
 #endif
-
-
-
-XY2_100 galvo;
-
-#include <CircularBuffer.h>
-CircularBuffer<GCode, BUFFERSIZE> commandBuffer;
-CircularBuffer<GCode, BUFFERSIZE> mBuffer;
-
-#include "SerialCMDReader.h"
-SerialCMDReader serialReciever;
-
-uint64_t next_command_time = 0;
-
-bool beginNext = true;
-static uint64_t startNanos;
-static uint64_t endNanos;
-
-static uint64_t _now;
-
-static coordinate lastMove;
-coordinate to;
-
-static double distx;
-static double disty;
-static double distz;
-
-static double feedrate = DEFAULT_FEEDRATE;
-
-GCode * oldPreviousMove;
-GCode * previousMove;
-GCode * currentMove;
-GCode * nextMove;
-
-coordinate target;
-int lastLaserPWR = 0;
-bool laserChanged = false;
-int itcnt = 0;
-static int interpolCnt = 0;
-
+LaserController *laser;
 void setup() {
-  lastMove.x = 0;
-  lastMove.y = 0;
-  lastMove.z = 0;
+  serialReciever = new SerialCMDReader(&commandBuffer);
+  serialReciever->begin();
 
-  to.x = 0;
-  to.y = 0;
-  to.z = 0;
-  
-  Serial.begin(115200);
-#ifdef LASER_IS_SYNRAD
-  laser.begin(LASER_PWM_OUT_PIN, LASER_SSR_OUT_PIN);
-#endif
-  galvo.begin(); //TODO:ADD define "Galvo has SSR" for galvo PSU
-  serialReciever.begin(&commandBuffer);
-}
+  #ifdef LASER_IS_SYNRAD
+  laser = new Synrad48Ctrl();
+  #else
+  //implement PWMLaser
+  #endif
+  laser->begin(LASER_PWM_OUT_PIN, LASER_SSR_OUT_PIN);
+  //init Galvo Protocol
+  galvo = new XY2_100();
+  galvo->begin(); //TODO:ADD define "Galvo has SSR" for galvo PSU
 
-void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, double* result)  {  //Velocity is presumed to be in coordinates/s
+  motion = new MotionMGR(&commandBuffer);
+  motion->begin(galvo, laser);
 
-  double lengthOfMove = sqrt( (0.0 + xdist)*(0.0 + xdist)  + (0.0 + ydist)*(0.0 + ydist) ); // calc hypo a^2+b^2=c^2
-  //TODO: Verify unit conversion
-  *result = ((lengthOfMove*1000*1000*1000/moveVelocity)); //s=v*t -> s/v =t   (movelength/moveVolocity) -> 2pos / (4pos/s) = 0.5s *1000 = 500ms
-  return;
-}
-
-void processMcode(GCode* code)
-{
-  //Serial.print("\nExecuting MCode: ");Serial.print(code->codeprefix);Serial.println(code->code);
-  //Serial.print("-- Executing MCode: Not Implemented\n");
-}
-
-void process()  {
-  _now = nanos();
-  
-  if(beginNext)  {
-    while(!mBuffer.isEmpty())    {
-      //processMCodes
-      GCode* cmd = new GCode(mBuffer.shift());
-        processMcode(cmd);
-        delete cmd;
-    }
-    
-    delete oldPreviousMove; 
-    oldPreviousMove = previousMove;
-    previousMove = currentMove;
-    currentMove = nextMove;
-
-    bool gcodeFound = false;
-    while(!gcodeFound && !commandBuffer.isEmpty())
-    {
-      nextMove = new GCode((commandBuffer.pop()));
-      if((*nextMove).codeprefix != 'G'){
-        mBuffer.unshift(*nextMove);
-      }
-      else{
-        gcodeFound = true;  
-      }       
-    }      
-    if(!gcodeFound){
-      nextMove = NULL;
-    }
-
-    // Buffer MGMT is done 
-
-    //Allways update history...
-    if(previousMove)  //SET UP PREVIOUS POSITION
-    {
-      if((*previousMove).x != MAX_VAL)
-        lastMove.x = (*previousMove).x;
-      if((*previousMove).y != MAX_VAL)
-        lastMove.y = (*previousMove).y;
-      if((*previousMove).z != MAX_VAL)
-        lastMove.z = (*previousMove).z;
-    }
-    
-    if(currentMove)  { 
-      if((*currentMove).x != MAX_VAL)
-        to.x = (*currentMove).x;
-      if((*currentMove).y != MAX_VAL)
-        to.y = (*currentMove).y;
-      if((*currentMove).z != MAX_VAL)
-        to.z = (*currentMove).z;
-      if((*currentMove).f != MAX_VAL)
-        feedrate = (*currentMove).f;
-        
-      // Set Laser Power
-      if((*currentMove).s != MAX_VAL)
-      {
-        lastLaserPWR = (*currentMove).s;
-        laserChanged = true;
-      }
-
-      if((*currentMove).code != 0) { // G0 means no calculation and no interpolation as feedrate is ignored and laser is expected off.
-        laser.setLaserPWM(lastLaserPWR);
-        startNanos = _now;      
-        distx = to.x-lastMove.x;
-        disty = to.y-lastMove.y;
-        distz = to.z-lastMove.z; // not used.....
-        calculateMoveLengthNanos(distx, disty, feedrate, &((*currentMove).moveLengthNanos));
-        endNanos = startNanos + (*currentMove).moveLengthNanos;
-      }
-      else
-      {
-        laser.setLaserPWM(0);
-      }
-      //laser.handleLaser();
-      beginNext = false;
-    }
-  }
-  
-  //interpolate  
-  if(currentMove && (_now > endNanos || (*currentMove).code == 0))  //We are out of time or G0
-  {
-    laser.handleLaser();
-    galvo.goTo(map(to.x, 0.0,250.0, 65535,0)+0.5, map(to.y, 0.0,250.0, 0,65535)+0.5); //Make sure to hit the commanded position
-    beginNext = true;
-    interpolCnt=0;
-    return;
-  }
-  else if (currentMove)
-  {
-
-
-    distx = to.x-lastMove.x;
-    disty = to.y-lastMove.y;
-    distz = to.z-lastMove.z; // not used.....
-    uint64_t t = (*currentMove).moveLengthNanos; 
-    double fraction_of_move = (double)(_now-startNanos)/t;
-    double x = (lastMove.x + (distx*fraction_of_move));
-    double y = (lastMove.y + (disty*fraction_of_move));
-    interpolCnt++;
-    laser.handleLaser();
-    galvo.goTo( map(x, 0.0,250.0, 65535,0)+0.5, map(y, 0.0,250.0, 0,65535)+0.5 );
-    return ;
-  }
-  else 
-  {
-    //Serial.println("Idle");
-  }
-  return;
 }
 
 void loop() {  
+  serialReciever->handleSerial();
+  motion->tic();
+}
 
-    serialReciever.handleSerial();
-    process();
-    
-#ifdef LASER_IS_SYNRAD
-    //laser.handleLaser();    
-#endif
+void setGalvoPosition(double x, double y)
+{
+  int tmp_x = map(x, 0.0,X_MAX_POS_MM, 65535,0)+0.5;
+  int tmp_y = map(y, 0.0,Y_MAX_POS_MM, 65535,0)+0.5;
 
+  galvo->setPos(tmp_x, tmp_y);
+}
+
+void setLaserPower(double PWM)
+{
+  double tmp_pwmMax = LASER_PWM_MAX;
+  int tmp_LaserRes = LASER_RESOLUTION;
+  double pinVal = map(PWM,0.0,tmp_pwmMax,0,(exp2(tmp_LaserRes))+0.0);
+  laser->update((int)pinVal);
+  // Serial.print("LaserPower requested at (0-");
+  // Serial.print(tmp_pwmMax);
+  // Serial.print("): ");Serial.print(PWM);
+
+  // Serial.print("\nLaserPower set to (0-");
+  // Serial.print((exp2(tmp_LaserRes))); 
+  // Serial.print("):");
+  // Serial.print(pinVal);
 }
 
 

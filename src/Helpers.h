@@ -26,10 +26,14 @@
 #define DEFAULT_FEEDRATE 100
 #define MAX_VAL 2147483630
 #define LASER_IS_SYNRAD
-
+#define X_MAX_POS_MM 250
+#define Y_MAX_POS_MM 250
 #define LASER_MAX 4096
+#define LASER_PWM_MAX 255;
+#define LASER_RESOLUTION 12;
 
   uint64_t nanos();
+
 struct coordinate {
   double x = MAX_VAL;
   double y = MAX_VAL;
@@ -44,6 +48,10 @@ struct coordinate {
   double y;
   double z;
   double e;
+
+  double a;
+  double b;
+  double c;
 
   double i;
   double j;

@@ -41,15 +41,23 @@
 class SerialCMDReader
 {
 	public:
-		SerialCMDReader();
-    void begin(CircularBuffer<GCode, BUFFERSIZE> *buf);
+		SerialCMDReader(CircularBuffer<GCode, BUFFERSIZE> *buf);
+    void begin();
     void stop(void);
-    CircularBuffer<GCode, BUFFERSIZE> *commandBuffer;
+    
     void handleSerial();
     GCode* process_string(char instruction[]);
   private:
     int cnt = 0;
-  
+    CircularBuffer<GCode, BUFFERSIZE> *bufRef;
+    double getVal(char chr , char *chArr, int length)
+    {
+      if(has_command(chr, chArr, length))
+        return (double)search_string(chr, chArr, length);
+      else
+        return MAX_VAL;
+    }
+
     void init_process_string(char instruction[])  {
       //init our command
       for (byte i=0; i<COMMAND_SIZE; i++)

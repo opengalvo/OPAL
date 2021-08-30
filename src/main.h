@@ -19,5 +19,33 @@
   along with OPAL Firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-void processMcode(GCode* code);
+#pragma once
+
+#ifdef __AVR__
+#error "Sorry, this only works on 32 bit Teensy boards.  AVR isn't supported."
+#endif
+
+#if TEENSYDUINO < 121
+#error "Minimum PJRC Teensyduino version 1.21 is required"
+#endif
+
+#ifndef MAIN_h
+#define MAIN_h
+
+#include <Arduino.h>
+//#include <HardwareSerial.h>
+#include <CircularBuffer.h>
+#include <XY2_100.h>
+#include "Pins.h"
+#include "Helpers.h"
+#include "LaserController.h"
+#include "Synrad48Ctrl.h"
+#include "MotionMGR.h"
+#include "SerialCMDReader.h"
+
+
 void process();
+void setLaserPower(double PWM); 
+void setGalvoPosition(double x, double y);
+
+#endif
