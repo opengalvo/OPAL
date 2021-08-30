@@ -55,6 +55,7 @@ private:
   void interpolateMove();
   void calculateMoveLengthNanos(double xdist, double ydist, double moveVelocity, double* result);
   void setVal(double* varToSet, double valToSet);
+  void setValG91(double* varToSet, double valToAdd, double base);
   void setXYZ(GCode* code);
   CircularBuffer<GCode, BUFFERSIZE> *bufRef;
   CircularBuffer<GCode, BUFFERSIZE> mBuf;

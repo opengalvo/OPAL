@@ -74,14 +74,6 @@ void setLaserPower(double PWM)
   int tmp_LaserRes = LASER_RESOLUTION;
   double pinVal = map(PWM,0.0,tmp_pwmMax,0,(exp2(tmp_LaserRes))+0.0);
   laser->update((int)pinVal);
-  // Serial.print("LaserPower requested at (0-");
-  // Serial.print(tmp_pwmMax);
-  // Serial.print("): ");Serial.print(PWM);
-
-  // Serial.print("\nLaserPower set to (0-");
-  // Serial.print((exp2(tmp_LaserRes))); 
-  // Serial.print("):");
-  // Serial.print(pinVal);
 }
 
 

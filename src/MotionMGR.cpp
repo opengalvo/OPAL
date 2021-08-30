@@ -215,6 +215,13 @@ void MotionMGR::setVal(double* varToSet, double valToSet)
   if(valToSet!=MAX_VAL)
     *varToSet = valToSet;
 }
+void MotionMGR::setValG91(double* varToSet, double valToSet, double base)
+{
+  if(valToSet!=MAX_VAL)
+    *varToSet = base + valToSet;
+  else
+    *varToSet = base;
+}
 void MotionMGR::setXYZ(GCode* code)
 {
   if(CURRENT_ABSOLUTE) {                               //G90 - ABSOLUTE
@@ -223,9 +230,9 @@ void MotionMGR::setXYZ(GCode* code)
     setVal(&CURRENT_TO_Z, code->z);
   }
   else{                                               //G91 - RELATIVE
-    setVal(&CURRENT_TO_X, CURRENT_FROM_X + code->x);
-    setVal(&CURRENT_TO_Y, CURRENT_FROM_Y + code->y);
-    setVal(&CURRENT_TO_Z, CURRENT_FROM_Z + code->z);
+    setValG91(&CURRENT_TO_X, code->x,CURRENT_FROM_X);
+    setValG91(&CURRENT_TO_Y, code->y,CURRENT_FROM_Y);
+    setValG91(&CURRENT_TO_Z, code->z,CURRENT_FROM_Z);
   }
 }
 
