@@ -23,8 +23,6 @@
 
 
 static CircularBuffer<GCode, BUFFERSIZE> commandBuffer;
-static CircularBuffer<GCode, BUFFERSIZE> mBuffer;
-
 
 MotionMGR* motion;
 
@@ -70,9 +68,10 @@ void setGalvoPosition(double x, double y)
 
 void setLaserPower(double PWM)
 {
-  double tmp_pwmMax = LASER_PWM_MAX;
+  double tmp_PWMMin = LASER_MIN_PWM_PERCENT;
+  double tmp_Max = LASER_MAX;
   int tmp_LaserRes = LASER_RESOLUTION;
-  double pinVal = map(PWM,0.0,tmp_pwmMax,0,(exp2(tmp_LaserRes))+0.0);
+  double pinVal = map(PWM,0.0,tmp_Max,tmp_PWMMin,(exp2(tmp_LaserRes))+0.0);
   laser->update((int)pinVal);
 }
 
