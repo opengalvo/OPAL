@@ -63,6 +63,7 @@ struct coordinate {
   double r; // Misc
   double t; // Misc
   double moveLengthNanos;
+  char FWD_CMD[150];
 };
 
 

@@ -43,9 +43,18 @@
 #include "MotionMGR.h"
 #include "SerialCMDReader.h"
 
+static bool AXIS_INVERSE_X = true;
+static bool AXIS_INVERSE_Y = false;
 
 void process();
 void setLaserPower(double PWM); 
 void setGalvoPosition(double x, double y);
+bool ReadSerial5();
+void xinit_process_string(char instruction[]);
+void setNextFWDMSG(char MSG[150]);
+
+
+
+//int mcnt = 0;
 
 #endif

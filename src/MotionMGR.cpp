@@ -88,7 +88,22 @@ void MotionMGR::processMcode(GCode* code)
     //M5
       CURRENT_LASERENABLED = false;
       break;
-    
+    case 9:
+      Serial.print("Processing M9 from Queue: ");
+      Serial.println(code->FWD_CMD);
+      setNextFWDMSG(code->FWD_CMD);
+      //TODO: Should set a 'WaitForM400Sync' Flag.
+      return;
+         case 80:
+    //G80
+      digitalWrite(11,1);
+      return;
+      break;
+    case 81:
+    //G81
+      digitalWrite(11,0);
+      return;
+      break;
     default:
       break;
     }
@@ -102,10 +117,9 @@ void MotionMGR::processMcode(GCode* code)
       CURRENT_ABSOLUTE = true;
       break;
     case 91:
-    //G90
+    //G91
       CURRENT_ABSOLUTE = false;
-      break;
-    
+      break;    
     default:
       break;
     }

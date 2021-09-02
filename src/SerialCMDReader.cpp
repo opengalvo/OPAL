@@ -84,9 +84,19 @@ GCode* SerialCMDReader::process_string(char instruction[])
   //TODO: determine if delete newcode is needed to keep memmory clean...
   
   if(has_command('M', instruction, cnt))        {
+    int startpos = has_command_at('M', instruction, cnt); //Linenumbering disrupts startposition
+    
     newCode->codeprefix = 'M';
     newCode->code = (double)search_string('M', instruction, cnt);
-
+    if(newCode->code == 9)
+    {
+      if(startpos != -1)
+        strcat((*newCode).FWD_CMD,instruction+startpos);
+      else
+        strcat((*newCode).FWD_CMD,instruction); //TODO: remove: Desperate recovery attempt
+      return newCode;
+    }
+      
     newCode->s = getVal('S', instruction, cnt);
     
     Serial.println("ok");  
@@ -111,7 +121,8 @@ GCode* SerialCMDReader::process_string(char instruction[])
     newCode->s = getVal('S', instruction, cnt);
     newCode->t = getVal('T', instruction, cnt);
 
-    Serial.println("ok");  
+    Serial.println("ok"); 
+    Serial.println(tempmonGetTemp());   
     return newCode;
   } //END of Gcode
   else 
@@ -130,8 +141,8 @@ GCode* SerialCMDReader::process_string(char instruction[])
     newCode->r = getVal('R', instruction, cnt);
     newCode->s = getVal('S', instruction, cnt);
     newCode->t = getVal('T', instruction, cnt);
-
-    Serial.println("ok");  
+    
+    Serial.println("ok"); 
     return newCode;
   }
 }

@@ -72,6 +72,14 @@ class SerialCMDReader
       }
       return false;
     }
+
+    int has_command_at(char key, char instruction[], int string_size) {
+      for (byte i=0; i<string_size; i++)    {
+        if (instruction[i] == key)
+          return i;
+      }
+      return -1;
+    }
     
     double search_string(char key, char instruction[], int string_size) {
       char temp[10] = "";
