@@ -22,10 +22,18 @@
 #pragma once
 
 #ifndef HELPERS_H
-
+#define BUFFERSIZE 50
+#define DEFAULT_FEEDRATE 100
 #define MAX_VAL 2147483630
+#define LASER_IS_SYNRAD
+#define X_MAX_POS_MM 250
+#define Y_MAX_POS_MM 250
+#define LASER_MIN_PWM_PERCENT 10
+#define LASER_MAX 255
+#define LASER_RESOLUTION 12;
 
   uint64_t nanos();
+
 struct coordinate {
   double x = MAX_VAL;
   double y = MAX_VAL;
@@ -55,6 +63,7 @@ struct coordinate {
   double r; // Misc
   double t; // Misc
   double moveLengthNanos;
+  char FWD_CMD[150];
 };
 
 

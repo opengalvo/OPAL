@@ -34,7 +34,6 @@
 #include <Arduino.h>
 #include <CircularBuffer.h>
 #include "helpers.h"
-#include "configuration.h"
 
 #define COMMAND_SIZE 150
 
@@ -42,15 +41,23 @@
 class SerialCMDReader
 {
 	public:
-		SerialCMDReader();
-    void begin(CircularBuffer<GCode, CMDBUFFERSIZE> *buf);
+		SerialCMDReader(CircularBuffer<GCode, BUFFERSIZE> *buf);
+    void begin();
     void stop(void);
-    CircularBuffer<GCode, CMDBUFFERSIZE> *commandBuffer;
+    
     void handleSerial();
     GCode* process_string(char instruction[]);
   private:
     int cnt = 0;
-  
+    CircularBuffer<GCode, BUFFERSIZE> *bufRef;
+    double getVal(char chr , char *chArr, int length)
+    {
+      if(has_command(chr, chArr, length))
+        return (double)search_string(chr, chArr, length);
+      else
+        return MAX_VAL;
+    }
+
     void init_process_string(char instruction[])  {
       //init our command
       for (byte i=0; i<COMMAND_SIZE; i++)
@@ -64,6 +71,14 @@ class SerialCMDReader
           return true;
       }
       return false;
+    }
+
+    int has_command_at(char key, char instruction[], int string_size) {
+      for (byte i=0; i<string_size; i++)    {
+        if (instruction[i] == key)
+          return i;
+      }
+      return -1;
     }
     
     double search_string(char key, char instruction[], int string_size) {

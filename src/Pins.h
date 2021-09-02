@@ -23,31 +23,8 @@
 
 #ifndef PINS_H
   #define PINS_H
-  /*
-  The following pins are not configurable as DIRECT PORT Writes are used within the code
-    XY2_100 - clock = 22;
-    XY2_100 - sync  = 17;  
-    XY2_100 - dataX = 19;
-    XY2_100 - dataY = 14;
-  */
-
- /*
-  Pin for SSR Relay control of stepper PSU
- */
-  #define STEPPER_SSR_OUT_PIN 3
- /*
-  Pin for SSR Relay control of galvo PSU
- */
-  #define GALVO_SSR_OUT_PIN 2
-
-   /*
-  Pin for SSR Relay control of laser PSU
- */
+  
   #define LASER_SSR_OUT_PIN 1
-
-  /*
-    PWM pin to control laser power/intensity (0-4095)
-  */
   #define LASER_PWM_OUT_PIN 6
 
 #endif
