@@ -33,7 +33,7 @@
 #define SYNRAD48CTRL_h
 
 #include <Arduino.h>
-#include <LaserController.h>
+#include "LaserController.h"
 
 class Synrad48Ctrl : public LaserController {
 	public:

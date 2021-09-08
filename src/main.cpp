@@ -52,11 +52,10 @@ void setup() {
   motion = new MotionMGR(&commandBuffer);
   motion->begin(galvo, laser);
   Serial5.begin(115200);
-  Serial5.print("G28\nG1X30Y30Z30\nG28");
+  Serial5.print("G28\n");
 }
 char* nextFWDMSG[150];
 void loop() {  
-  static int count = 0;
   if(Serial5.available())
   {
     ReadSerial5();
@@ -65,13 +64,9 @@ void loop() {
   {
     if(!FWDBuffer.isEmpty())
     {
-      Serial.println("dequeue!");
       String data = FWDBuffer.pop();
       Serial5.print(data);
       Serial5.print("\n");
-      Serial.print("SENTDATA:");
-      Serial.print(data);
-      Serial.print("\n");
     }
   }
   serialReciever->handleSerial();
