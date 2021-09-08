@@ -42,7 +42,7 @@ class XY2_100 {
 public:
   XY2_100();
   void begin(void);
-  void goTo(uint16_t x, uint16_t y);
+  void setPos(uint16_t x, uint16_t y);
   static uint8_t parity(uint16_t v);
   
 private:

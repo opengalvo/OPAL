@@ -25,9 +25,17 @@
 #define CMDBUFFERSIZE 50 //Number of cashed GCodes
 #define MBUFFERSIZE 20  //Buffersize for MCODES - number of consecutive M-Codes before another G-Code
 #define DEFAULT_FEEDRATE 100
+
 #define LASER_IS_SYNRAD
-#define LASER_MAX 4096
-#define LASER_G0_OFF_G1_ON
+#define LASER_RESOLUTION 12
+#define LASER_PWM_MAX 50
+//#define LASER_G0_OFF_G1_ON
+
+#define X_MAX 250 //mm
+#define Y_MAX 250 //mm
+
+#define INVERSE_X
+//#define INVERSE_Y
 
 #define CONFIGURATION_H
 #endif

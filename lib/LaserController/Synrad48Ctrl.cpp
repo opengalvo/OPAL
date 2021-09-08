@@ -21,9 +21,18 @@
 
 #include <Arduino.h>
 
+//#ifndef TEENSY_TIMER_TOOL
+//#include <TeensyTimerTool.h>
+//using namespace TeensyTimerTool;
+//#define TEENSY_TIMER_TOOL
+//#endif
+
 #include <string.h>
 #include "Synrad48Ctrl.h"
 #define LASER_RESOLUTION 12
+
+
+//PeriodicTimer t2;
 
 Synrad48Ctrl::Synrad48Ctrl()
 {
@@ -32,13 +41,17 @@ Synrad48Ctrl::Synrad48Ctrl()
 
 uint16_t LastPWMRequest = 0;
 
-void Synrad48Ctrl::setLaserPWM(uint16_t PWM)
+void Synrad48Ctrl::update(uint16_t PWM)
 {
   laserPWM = PWM;
   handleLaser();
   }
+void Synrad48Ctrl::update()
+{
+  handleLaser();
+}
 
-void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
+void Synrad48Ctrl::begin(int PWM_OUT_Pin, int PSU_SSR_Pin)
 {
   if(laserState != 30)
   {
@@ -54,11 +67,13 @@ void Synrad48Ctrl::begin(uint16_t PWM_OUT_Pin, uint16_t PSU_SSR_Pin)
     
     digitalWrite(laserPSU_SSR_Pin,0);
     analogWrite(laserPWM_OUT_Pin,0);
-    delay(laserInitTime );
+    delay(laserInitTime + 10 );
     digitalWrite(laserPSU_SSR_Pin,1);
-    
+    // waist of recources - call handle laser at the beginning of each command instead. //t2.begin(this->handleLaser, 50); //50us = 20kHz
+  
     laserState = 0;
     laserPWM = 0;
+    oldlaserPWM = 0;
   }
 }
 
@@ -70,8 +85,6 @@ void Synrad48Ctrl::stop()
   laserState = 30;
 }
 
- 
-  
 bool Synrad48Ctrl::isInitiallized()
 {
   if(laserState==3 || laserState==4)
@@ -84,17 +97,14 @@ void Synrad48Ctrl::handleLaser()
 {
   if(isInitiallized())
   {
-    if( laserPWM==oldlaserPWM)
-    {
-      //Serial.print("\n"); Serial.print(laserPWM); Serial.print(""); Serial.print("Old and new are same"); 
+    digitalWrite(13,1);
+    if( laserPWM==oldlaserPWM) //Nothing changed
       return;
-    }
     if(laserPWM!=oldlaserPWM)
-    {
-      //Serial.print("\n"); Serial.print(laserPWM); Serial.print("Old and new are Different ======\n========\n========\n======\n======");
       oldlaserPWM = laserPWM;
-    }
   }
+  else
+    digitalWrite(13,0);
   
 /*   |
  *  LaserStates:
@@ -106,8 +116,7 @@ void Synrad48Ctrl::handleLaser()
  *       30 = DISABLED        - LaserEnable_Pin is HIGH, state is held for 5 seconds
 */
 
-  //Serial.print("\nhandle Laser in state: ");Serial.print(laserState);
-  int laserEnablePinState = HIGH; //digitalRead(Synrad48Ctrl::laserEnable_Pin);
+  int laserEnablePinState = HIGH; //TODO: Impl... digitalRead(Synrad48Ctrl::laserEnable_Pin);
   if(laserEnablePinState == LOW)
   {
     laserState = 30;  //TODO: Fix how to get out of this
@@ -150,7 +159,6 @@ void Synrad48Ctrl::handleLaser()
       case 3:
       {
         // IN READY STATE
-        digitalWrite(13,1); //Set LED ON
         if(laserPWM>laserPWMLowerLimit)
           laserState = 4;
         else
@@ -167,10 +175,11 @@ void Synrad48Ctrl::handleLaser()
           laserState = 3;
         }
         else
-          if(!(Synrad48Ctrl::laser_Shutter))
+          //if(!(Synrad48Ctrl::laser_Shutter))
+          //TODO: FIX IMPLEMENTATION - Sync with LASER_ENABLED and add shutter to LaserController interface
             this->set20kPWM(laserPWM);
-          else
-            this->set5kPWM();
+          //else
+            //this->set5kPWM();
         break;
       }
       default:

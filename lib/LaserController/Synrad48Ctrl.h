@@ -33,15 +33,17 @@
 #define SYNRAD48CTRL_h
 
 #include <Arduino.h>
+#include <LaserController.h>
 
-class Synrad48Ctrl {
+class Synrad48Ctrl : public LaserController {
 	public:
 		Synrad48Ctrl();
-    void begin(uint16_t,uint16_t);
+    void begin(int PWM_OUT_Pin, int PSU_SSR_Pin);
     void stop(void);
     bool isInitiallized();
 		void handleLaser();
-		void setLaserPWM(uint16_t PWM);
+		void update(uint16_t PWM);
+		void update();
    
 	private:
     int                     laserState;
@@ -60,7 +62,6 @@ class Synrad48Ctrl {
 void set20kPWM(int PWM) {
   if(currentFreq != 20000) {
     currentFreq = 20000;
-    //Serial.print("\n Set 20");
     analogWriteFrequency(laserPWM_OUT_Pin, 20000);
   }
   analogWrite(laserPWM_OUT_Pin, laserPWM); //Output Laser
@@ -69,7 +70,6 @@ void set20kPWM(int PWM) {
 void set5kPWM() {
   if(currentFreq != 5000) {
     currentFreq = 5000;
-    //Serial.print("\n Set 5");
     analogWriteFrequency(laserPWM_OUT_Pin, 5000);
   }
   analogWrite(laserPWM_OUT_Pin, Synrad48Ctrl::ticklePWM); //Output Trickle

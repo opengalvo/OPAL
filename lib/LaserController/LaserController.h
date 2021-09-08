@@ -1,5 +1,5 @@
 /*
-  Helpers.cpp - Helper functions to be used by OPAL FW on PJRC Teensy 4.x board
+  LaserController.h - driver code for Synrad 48 Series laser on PJRC Teensy 4.x board
 
   Part of OpenGalvo - OPAL Firmware
 
@@ -19,18 +19,28 @@
   along with OPAL Firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
+#ifdef __AVR__
+#error "Sorry, this only works on 32 bit Teensy boards.  AVR isn't supported."
+#endif
+
+#if TEENSYDUINO < 121
+#error "Minimum PJRC Teensyduino version 1.21 is required"
+#endif
+
+#ifndef LASERCONTROLLER_h
+#define LASERCONTROLLER_h
+
 #include <Arduino.h>
 
-uint64_t nanos()  // Code by luni @ https://forum.pjrc.com/threads/60493-A-Higher-Resolution-Micros
+class LaserController   
 {
-    static uint32_t oldCycles = ARM_DWT_CYCCNT;
-    static uint64_t highValue = 0;
+    public:
+      void virtual begin(int PWM_OUT_Pin, int PSU_SSR_Pin) = 0;
+      void virtual stop() = 0;
+      void virtual update(uint16_t pwm) = 0;
+      void virtual update() = 0;
+};
 
-    uint32_t newCycles = ARM_DWT_CYCCNT;
-    if (newCycles < oldCycles)
-    {
-        highValue += 0x0000'0001'0000'0000;
-    }
-    oldCycles = newCycles;
-    return (highValue | newCycles) * (1E9/F_CPU);
-}
+#endif

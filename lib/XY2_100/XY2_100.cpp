@@ -107,15 +107,16 @@ void XY2_100::QT1_isr() {
         //WRITE SIGNAL
     cbitx = activePacketX[bitCount];
     cbity = activePacketY[bitCount];
-    d = (d & ~(1UL << 18)) | (cbity << 18); //pin14  GPIO 1.18
-    d = (d & ~(1UL << 16)) | (cbitx << 16);  //pin19 GPIO 1.16
+    d = (d & ~(1UL << 18)) | (cbity << 18); //PORT D3 --> pin14
+    d = (d & ~(1UL << 16)) | (cbitx << 16);  //PORT D2 --> pin19
    
     //WRITE SYNC
     if(bitCount >= 19)
     {
       bitCount = -1;
-      d = (d & ~(1UL << 22)) | (0 << 22);   // pin 17 GPIO 1.22
-      
+      d = (d & ~(1UL << 22)) | (0 << 22);   // PORT D1 --> pin 17
+      //d = (d & ~(1UL << 23)) | (1 << 23);   // PORT D4 --> pin 16
+
       //If we have new data, point the activePacket pointer to the array containing the new data
       if(hasData == 1)
       {
@@ -135,17 +136,20 @@ void XY2_100::QT1_isr() {
     }
     else
     {
-      d = (d & ~(1UL << 22)) | (1 << 22);     // pin 17 GPIO 1.22
+      d = (d & ~(1UL << 22)) | (1 << 22);     // PORT D1 --> pin 17
+      //d = (d & ~(1UL << 23)) | (0 << 23);   // PORT D4 --> pin 16
     }
    
     //WriteClkHi
-    d = (d & ~(1UL << 24)) | (1 << 24);       // pin 22 GPIO 1.24
+    d = (d & ~(1UL << 24)) | (1 << 24);       // PORT D1 --> pin 22
+    //d = (d & ~(1UL << 25)) | (0 << 25);     // PORT D1 --> pin 23
     bitCount++;
   }
   else
   {
     //Write ClkLow
-    d = (d & ~(1UL << 24)) | (0 << 24);       // pin 22 GPIO 1.24
+    d = (d & ~(1UL << 24)) | (0 << 24);       // PORT D1 --> pin 22
+    //d = (d & ~(1UL << 25)) | (1 << 25);     // PORT D1 --> pin 23
   }
 
   ClkHiLo = !ClkHiLo;
@@ -172,7 +176,7 @@ uint8_t XY2_100::parity(uint16_t v)
     return (t & 1);
 }
 
-void XY2_100::goTo(uint16_t x,uint16_t y)
+void XY2_100::setPos(uint16_t x,uint16_t y)
 {
   
     unsigned long dataX = XY2_100::buildMsg(x);
