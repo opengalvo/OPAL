@@ -25,7 +25,7 @@
 #include "SerialCMDReader.h"
 
 
-SerialCMDReader::SerialCMDReader(CircularBuffer<GCode, CMDBUFFERSIZE> *buf)
+SerialCMDReader::SerialCMDReader(CircularBuffer<GCode, BUFFERSIZE> *buf)
 {
   bufRef = buf;
 }
