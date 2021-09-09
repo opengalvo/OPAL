@@ -61,5 +61,6 @@ void setGalvoPosition(double x, double y);
 bool ReadSerial5();
 void xinit_process_string(char instruction[]);
 void setNextFWDMSG(char MSG[150]);
+void printWelcome();
 
 #endif
