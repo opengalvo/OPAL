@@ -36,15 +36,24 @@
 //#include <HardwareSerial.h>
 #include <CircularBuffer.h>
 #include <XY2_100.h>
+#include <LaserController.h>
+#include <Synrad48Ctrl.h>
 #include "Pins.h"
 #include "Helpers.h"
-#include "LaserController.h"
-#include "Synrad48Ctrl.h"
 #include "MotionMGR.h"
 #include "SerialCMDReader.h"
 
-static bool AXIS_INVERSE_X = true;
-static bool AXIS_INVERSE_Y = false;
+#ifdef AXIS_INVERSE_X
+  static bool AXIS_INVERSE_X = true;
+#else
+  static bool AXIS_INVERSE_X = false;
+#endif
+
+#ifdef AXIS_INVERSE_Y
+  static bool AXIS_INVERSE_Y = true;
+#else
+  static bool AXIS_INVERSE_Y = false;
+#endif
 
 void process();
 void setLaserPower(double PWM); 
@@ -52,9 +61,5 @@ void setGalvoPosition(double x, double y);
 bool ReadSerial5();
 void xinit_process_string(char instruction[]);
 void setNextFWDMSG(char MSG[150]);
-
-
-
-//int mcnt = 0;
 
 #endif

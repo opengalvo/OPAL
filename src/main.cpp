@@ -39,6 +39,13 @@ void setup() {
   serialReciever = new SerialCMDReader(&commandBuffer);
   serialReciever->begin();
 
+  // Init pins
+  pinMode(LASER_SSR_OUT_PIN, OUTPUT);
+  digitalWrite(LASER_SSR_OUT_PIN,0);
+
+  pinMode(GALVO_SSR_OUT_PIN, OUTPUT);
+  digitalWrite(GALVO_SSR_OUT_PIN,0);
+
   #ifdef LASER_IS_SYNRAD
   laser = new Synrad48Ctrl();
   #else
@@ -52,11 +59,11 @@ void setup() {
   motion = new MotionMGR(&commandBuffer);
   motion->begin(galvo, laser);
   Serial5.begin(115200);
-  Serial5.print("G28\nG1X30Y30Z30\nG28");
+
+  Serial5.print("G28\n");
 }
 char* nextFWDMSG[150];
 void loop() {  
-  static int count = 0;
   if(Serial5.available())
   {
     ReadSerial5();
@@ -65,13 +72,9 @@ void loop() {
   {
     if(!FWDBuffer.isEmpty())
     {
-      Serial.println("dequeue!");
       String data = FWDBuffer.pop();
       Serial5.print(data);
       Serial5.print("\n");
-      Serial.print("SENTDATA:");
-      Serial.print(data);
-      Serial.print("\n");
     }
   }
   serialReciever->handleSerial();
@@ -106,15 +109,8 @@ void setLaserPower(double PWM)
 
 void setNextFWDMSG(char MSG[150])
 {
-  
-  Serial.print("Adding to main buffer: ");
   String str = String(MSG);
-  Serial.println(str);
   FWDBuffer.unshift(str);
-  
-      Serial.print("Added: ");
-      
-      Serial.println(str);
 }
 
 bool ReadSerial5()
@@ -145,6 +141,9 @@ bool ReadSerial5()
   return retval;
 }
 
+/*
+Used by Serial5 to clear input string array.
+*/
 void xinit_process_string(char instruction[])  {
   //init our command
   for (byte i=0; i<COMMAND_SIZE; i++)

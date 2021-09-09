@@ -84,7 +84,7 @@ GCode* SerialCMDReader::process_string(char instruction[])
   //TODO: determine if delete newcode is needed to keep memmory clean...
   
   if(has_command('M', instruction, cnt))        {
-    int startpos = has_command_at('M', instruction, cnt); //Linenumbering disrupts startposition
+    int startpos = has_command_at('M', instruction, cnt); //Line numbering disrupts startposition
     
     newCode->codeprefix = 'M';
     newCode->code = (double)search_string('M', instruction, cnt);

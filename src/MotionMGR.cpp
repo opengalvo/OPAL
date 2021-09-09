@@ -1,19 +1,5 @@
 #include "MotionMGR.h"
 
-//uint64_t next_command_time = 0;
-
-
-
-// GCode * oldPreviousMove;
-// GCode * previousMove;
-// GCode * currentMove;
-// GCode * nextMove;
-
-// coordinate target;
-// int lastLaserPWR = 0;
-// bool laserChanged = false;
-// int itcnt = 0;
-// static int interpolCnt = 0;
 XY2_100* _galvo;
 LaserController* _laser;
 GCode* currentGcode;
@@ -28,25 +14,12 @@ void MotionMGR::begin(XY2_100* galvo, LaserController* laser)
   _galvo = galvo;
   _laser = laser;
   _status = IDLE;
-  
-//     beginNext = true
-//     lastMove.x = 0;
-//     lastMove.y = 0;
-//     lastMove.z = 0;
-
-//   to.x = 0;
-//   to.y = 0;
-//   to.z = 0;
-  
-
 }
 
 MotionStatus MotionMGR::getStatus()
 {
   return _status;
 }
-
-
 
 void MotionMGR::tic()
 {
@@ -94,16 +67,27 @@ void MotionMGR::processMcode(GCode* code)
       setNextFWDMSG(code->FWD_CMD);
       //TODO: Should set a 'WaitForM400Sync' Flag.
       return;
-         case 80:
-    //G80
-      digitalWrite(11,1);
+      
+    case 17:
+    //M17
+      digitalWrite(GALVO_SSR_OUT_PIN,1);
       return;
-      break;
+    case 18:
+    //M18
+      digitalWrite(GALVO_SSR_OUT_PIN,0);
+      return;
+
+    case 80:
+    //M80
+    Serial.print("Set 1 high");
+      digitalWrite(LASER_SSR_OUT_PIN,1);
+      return;
     case 81:
-    //G81
-      digitalWrite(11,0);
+    //M81
+    Serial.print("Set 1 low");
+      digitalWrite(LASER_SSR_OUT_PIN,0);
       return;
-      break;
+        
     default:
       break;
     }
@@ -177,13 +161,13 @@ void MotionMGR::processGcode(GCode* code)
   switch (code->code) {
     case 0:
       CURRENT_CODE = 0;
-      setXYZ(code);
+      setXY(code);
       break;
    case 1:
       CURRENT_CODE = 1;
       setVal(&CURRENT_F, code->f);
       setVal(&CURRENT_S, code->s);
-      setXYZ(code);
+      setXY(code);
       break;
       //TODO: Add G2 / G3 Implementation
     /* case 2:
@@ -236,7 +220,7 @@ void MotionMGR::setValG91(double* varToSet, double valToSet, double base)
   else
     *varToSet = base;
 }
-void MotionMGR::setXYZ(GCode* code)
+void MotionMGR::setXY(GCode* code)
 {
   if(CURRENT_ABSOLUTE) {                               //G90 - ABSOLUTE
     setVal(&CURRENT_TO_X, code->x);
