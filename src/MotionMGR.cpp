@@ -45,6 +45,10 @@ void MotionMGR::tic()
 
 void MotionMGR::processMcode(GCode* code)
 {
+  #ifdef DEBUG_GCODES
+    Serial.print("Processing Mcode from Queue: \n");
+    Serial.print("code"); Serial.println(code->code);
+  #endif
   if(code->codeprefix == 'M') {
     //Handle MCodes
     switch (code->code)
@@ -62,8 +66,6 @@ void MotionMGR::processMcode(GCode* code)
       CURRENT_LASERENABLED = false;
       break;
     case 9:
-      Serial.print("Processing M9 from Queue: ");
-      Serial.println(code->FWD_CMD);
       setNextFWDMSG(code->FWD_CMD);
       //TODO: Should set a 'WaitForM400Sync' Flag.
       return;
@@ -81,11 +83,20 @@ void MotionMGR::processMcode(GCode* code)
     //M80
     Serial.print("Set 1 high");
       digitalWrite(LASER_SSR_OUT_PIN,1);
+      if(_laser->isHalted())
+      {
+        delay(250);
+        _laser->begin(LASER_PWM_OUT_PIN,LASER_SSR_OUT_PIN);
+      }
       return;
     case 81:
     //M81
     Serial.print("Set 1 low");
       digitalWrite(LASER_SSR_OUT_PIN,0);
+      if(!_laser->isHalted())
+      {
+        _laser->stop();
+      }
       return;
         
     default:

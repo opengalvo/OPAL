@@ -34,6 +34,7 @@
 
 #include <Arduino.h>
 #include "Helpers.h"
+#include "configuration.h"
 #include "main.h"
 
 

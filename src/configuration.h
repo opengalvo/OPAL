@@ -22,6 +22,8 @@
 #pragma once
 #ifndef CONFIGURATION_H
 
+#define DEBUG_GCODES
+
 #define CMDBUFFERSIZE 50 //Number of cashed GCodes
 #define MBUFFERSIZE 20  //Buffersize for MCODES - number of consecutive M-Codes before another G-Code
 #define DEFAULT_FEEDRATE 100
