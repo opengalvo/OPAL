@@ -97,15 +97,11 @@ void Synrad48Ctrl::handleLaser()
 {
   if(isInitiallized())
   {
-    digitalWrite(13,1);
     if( laserPWM==oldlaserPWM) //Nothing changed
       return;
     if(laserPWM!=oldlaserPWM)
       oldlaserPWM = laserPWM;
   }
-  else
-    digitalWrite(13,0);
-  
 /*   |
  *  LaserStates:
  *       0 = BEGINWARMUP      - LaserEnable_Pin is HIGH, start the timer and go to warmup
