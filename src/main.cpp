@@ -39,6 +39,15 @@ void setup() {
   serialReciever = new SerialCMDReader(&commandBuffer);
   serialReciever->begin();
 
+  // Init pins
+  pinMode(LASER_SSR_OUT_PIN, OUTPUT);
+  digitalWrite(LASER_SSR_OUT_PIN,0);
+
+  pinMode(GALVO_SSR_OUT_PIN, OUTPUT);
+  digitalWrite(GALVO_SSR_OUT_PIN,0);
+
+
+
   #ifdef LASER_IS_SYNRAD
   laser = new Synrad48Ctrl();
   #else
