@@ -46,8 +46,6 @@ void setup() {
   pinMode(GALVO_SSR_OUT_PIN, OUTPUT);
   digitalWrite(GALVO_SSR_OUT_PIN,0);
 
-
-
   #ifdef LASER_IS_SYNRAD
   laser = new Synrad48Ctrl();
   #else
@@ -61,6 +59,7 @@ void setup() {
   motion = new MotionMGR(&commandBuffer);
   motion->begin(galvo, laser);
   Serial5.begin(115200);
+
   Serial5.print("G28\n");
 }
 char* nextFWDMSG[150];

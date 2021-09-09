@@ -87,6 +87,7 @@ void MotionMGR::processMcode(GCode* code)
     Serial.print("Set 1 low");
       digitalWrite(LASER_SSR_OUT_PIN,0);
       return;
+        
     default:
       break;
     }
