@@ -3,6 +3,8 @@
 Minimalistic FW for Processing GCode commands to xy2-100 protocol and control periferal devices.
 The default usecase is a 3D printer/engraver.
 
+If you are using the software please join: https://www.reddit.com/r/OpenGalvo/ and write a comment or share your project!
+
 DEMO
 Laser Marking - OpenGalvo - OPAL FW SG7110 Teensy 4.0
 Slow:
