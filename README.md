@@ -1,6 +1,6 @@
 # OPAL
 
-Minimalistic FW for Processing GCode commands to xy2-100 protocol and control periferal devices.
+Minimalistic FW for Processing GCode commands to xy2-100 protocol and control periferal devices using a Teensy board.
 The default usecase is a 3D printer/engraver. Galvos driven by XY2-100 protocol are refered to as Digital Galvos and are
 the subject of this repo.. Other options are Analog Galvos like the RC1001 and the various "Lasershow galvos" sold on e-bay.
 Analog galvos are not covered here but might have their own section in the future. The last option is Steppermotor driven
