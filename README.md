@@ -53,5 +53,7 @@ The firmware has features to control:
 
 Future plans include stepper integration and more I/O for SSRs but atm. stabillity is the main focus.
 
+This firmware makes use of rlogiacco's CircularBuffer: https://github.com/rlogiacco/CircularBuffer/issues?q=label:question
+
 Fun fact: OPAL refers to OPengALvo and the name is inspired by the sparks laser engraving does and their resemblance to the fire opal.
 
