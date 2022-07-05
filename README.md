@@ -55,5 +55,8 @@ Future plans include stepper integration and more I/O for SSRs but atm. stabilli
 
 This firmware makes use of rlogiacco's CircularBuffer: https://github.com/rlogiacco/CircularBuffer/issues?q=label:question
 
+Thanks to Les Lab - https://github.com/leswright1977 we have a PCB Design!
+for more info: https://github.com/leswright1977/OPAL_PCB
+
 Fun fact: OPAL refers to OPengALvo and the name is inspired by the sparks laser engraving does and their resemblance to the fire opal.
 
