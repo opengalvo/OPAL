@@ -51,7 +51,7 @@ class Synrad48Ctrl : public LaserController {
     uint16_t                laserPSU_SSR_Pin; // = 10;
     
     bool                    laser_Shutter       = false;
-    const static uint16_t   ticklePWM           = 4;
+    const static uint16_t   ticklePWM           = 21;
     int                     laserPWM            = 0;
     int                     laserPWMLowerLimit  = 50;
     uint32_t                tickleStart         = 0x0;
