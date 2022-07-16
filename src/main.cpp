@@ -58,6 +58,7 @@ void setup() {
 
   motion = new MotionMGR(&commandBuffer);
   motion->begin(galvo, laser);
+  printWelcome();
   Serial5.begin(115200);
 
   Serial5.print("G28\n");

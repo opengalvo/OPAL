@@ -41,6 +41,7 @@ class Synrad48Ctrl : public LaserController {
     void begin(int PWM_OUT_Pin, int PSU_SSR_Pin);
     void stop(void);
     bool isInitiallized();
+    bool isHalted();
 		void handleLaser();
 		void update(uint16_t PWM);
 		void update();
@@ -57,7 +58,8 @@ class Synrad48Ctrl : public LaserController {
     uint32_t                tickleStart         = 0x0;
     uint32_t                laserInitTime       = {0x1388}; //Millis to wait in warmup state / Tickle state during init
     int                     currentFreq         = 0;
-    int                  oldlaserPWM         = 0;
+    int                     oldlaserPWM         = 0;
+    bool                    _isHalted            = true;
 
 void set20kPWM(int PWM) {
   if(currentFreq != 20000) {

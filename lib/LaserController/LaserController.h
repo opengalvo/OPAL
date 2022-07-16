@@ -41,6 +41,7 @@ class LaserController
       void virtual stop() = 0;
       void virtual update(uint16_t pwm) = 0;
       void virtual update() = 0;
+      bool virtual isHalted();
 };
 
 #endif

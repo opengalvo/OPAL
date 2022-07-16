@@ -34,3 +34,13 @@ uint64_t nanos()  // Code by luni @ https://forum.pjrc.com/threads/60493-A-Highe
     oldCycles = newCycles;
     return (highValue | newCycles) * (1E9/F_CPU);
 }
+
+void printWelcome()
+{
+  Serial.print("\n\n\n");
+  Serial.println("********************************************");
+  Serial.println("* Teensy running OpenGalvo OPAL Firmware   *");
+  Serial.println("*  -This is BETA Software                  *");
+  Serial.println("*  -Do not leave any hardware unattended!  *");
+  Serial.println("********************************************");
+}
