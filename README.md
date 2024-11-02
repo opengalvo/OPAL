@@ -58,5 +58,8 @@ This firmware makes use of rlogiacco's CircularBuffer: https://github.com/rlogia
 Thanks to Les Lab - https://github.com/leswright1977 we have a PCB Design!
 for more info: https://github.com/leswright1977/OPAL_PCB
 
+Recently this SW has been used to 3D print metal! Awesome work @metalmatters!
+https://www.youtube.com/watch?v=_SwsatEJn9k
+
 Fun fact: OPAL refers to OPengALvo and the name is inspired by the sparks laser engraving does and their resemblance to the fire opal.
 
